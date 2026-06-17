@@ -5,9 +5,12 @@ import { parseBody, handleError } from "@/lib/validate";
 import { recommendSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
+import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
+  const limited = rateLimit(req, { name: "recommend", max: 10, windowMs: 60000 });
+  if (limited) return limited;
   const { data, response } = await parseBody(recommendSchema, req);
   if (response) return response;
 

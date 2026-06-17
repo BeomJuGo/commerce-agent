@@ -49,6 +49,12 @@ npm run dev
 
 API 라우트는 mongodb 드라이버를 사용하므로 Node.js 런타임에서 실행됩니다(`export const runtime = "nodejs"`).
 
+### 레이트리밋 / 보안
+
+모든 `/api` 라우트에 IP 기반 경량 레이트리밋(`lib/rateLimit.js`)이 적용되어 있습니다(GPT 라우트 10/분, dashboard 20/분, links 30/분). 공유 OpenAI·네이버 키 할당량을 캐주얼 남용으로부터 보호하기 위한 1차 방어선입니다.
+
+> 서버리스에서는 인스턴스별 인메모리라 **best-effort**입니다. 트래픽이 많거나 하드 제한이 필요하면 **Vercel WAF rate rules**를 함께 사용하세요. 키 노출 위험이 크면 이 프로젝트 전용 OpenAI/네이버 키를 별도 발급하는 것을 권장합니다.
+
 ## 고객 응대 위젯 삽입
 
 임의의 쇼핑몰 HTML에 아래 한 줄을 추가하면 우하단에 AI 상담 챗봇이 떠 응대합니다.

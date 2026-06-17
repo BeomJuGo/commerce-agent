@@ -5,8 +5,11 @@ import { parseQuery, checkAdmin, handleError } from "@/lib/validate";
 import { dashboardQuerySchema } from "@/lib/schemas";
 import { chatJSON } from "@/lib/openai";
 import { getDb } from "@/lib/mongodb";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(req) {
+  const limited = rateLimit(req, { name: "dashboard", max: 20, windowMs: 60000 });
+  if (limited) return limited;
   const auth = checkAdmin(req);
   if (auth) return auth;
 

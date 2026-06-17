@@ -6,6 +6,7 @@ import { parseBody, parseQuery, handleError } from "@/lib/validate";
 import { linksPostSchema, linksQuerySchema, linksDeleteQuerySchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { getDb } from "@/lib/mongodb";
+import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
 
 async function getDatabase() {
@@ -19,6 +20,8 @@ async function getDatabase() {
 const NO_DB = () => NextResponse.json({ error: "MongoDB 미설정", message: "링크 저장소가 없습니다." }, { status: 503 });
 
 export async function POST(req) {
+  const limited = rateLimit(req, { name: "links-write", max: 30, windowMs: 60000 });
+  if (limited) return limited;
   const { data, response } = await parseBody(linksPostSchema, req);
   if (response) return response;
   const db = await getDatabase();
@@ -56,6 +59,8 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
+  const limited = rateLimit(req, { name: "links-read", max: 60, windowMs: 60000 });
+  if (limited) return limited;
   const { searchParams } = new URL(req.url);
   const { data, response } = parseQuery(linksQuerySchema, searchParams);
   if (response) return response;
@@ -82,6 +87,8 @@ export async function GET(req) {
 }
 
 export async function DELETE(req) {
+  const limited = rateLimit(req, { name: "links-write", max: 30, windowMs: 60000 });
+  if (limited) return limited;
   const { searchParams } = new URL(req.url);
   const { data, response } = parseQuery(linksDeleteQuerySchema, searchParams);
   if (response) return response;

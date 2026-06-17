@@ -6,11 +6,14 @@ import { chatSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { chatText } from "@/lib/openai";
 import { getDb } from "@/lib/mongodb";
+import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
 
 const PRODUCT_INTENT = /추천|가격|얼마|사고|구매|제품|상품|찾|비교|배송|재고|사이즈|색상/;
 
 export async function POST(req) {
+  const limited = rateLimit(req, { name: "chat", max: 15, windowMs: 60000 });
+  if (limited) return limited;
   const { data, response } = await parseBody(chatSchema, req);
   if (response) return response;
 

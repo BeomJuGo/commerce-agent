@@ -6,9 +6,12 @@ import { reviewSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
 import { getDb } from "@/lib/mongodb";
+import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
+  const limited = rateLimit(req, { name: "review", max: 10, windowMs: 60000 });
+  if (limited) return limited;
   const { data, response } = await parseBody(reviewSchema, req);
   if (response) return response;
 

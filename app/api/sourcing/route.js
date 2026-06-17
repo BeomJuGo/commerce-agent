@@ -5,9 +5,12 @@ import { parseBody, handleError } from "@/lib/validate";
 import { sourcingSchema } from "@/lib/schemas";
 import { searchShop, priceStats } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
+import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
+  const limited = rateLimit(req, { name: "sourcing", max: 10, windowMs: 60000 });
+  if (limited) return limited;
   const { data, response } = await parseBody(sourcingSchema, req);
   if (response) return response;
 
