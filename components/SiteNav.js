@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { TOOLS } from "@/lib/tools";
 
-export default function SiteNav() {
+export default function SiteNav({ authed = false }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -85,27 +85,67 @@ export default function SiteNav() {
                   animation: "caDrop .18s ease both",
                 }}
               >
-                {TOOLS.map((t) => (
-                  <Link
-                    key={t.href}
-                    href={t.href}
-                    className="ca-dd-item"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      textDecoration: "none",
-                      padding: "14px 18px",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 12,
-                      background: "#1a1a1a",
-                    }}
-                  >
-                    <span style={{ fontSize: 13.5, fontWeight: 600, color: "#eaeaea", whiteSpace: "nowrap" }}>
-                      {t.title}
-                    </span>
-                  </Link>
-                ))}
+                {TOOLS.map((t) => {
+                  const locked = t.href === "/dashboard" && !authed;
+                  if (locked) {
+                    return (
+                      <div
+                        key={t.href}
+                        title="관리자 로그인 후 이용 가능"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 6,
+                          padding: "14px 18px",
+                          border: "1px dashed rgba(255,255,255,0.12)",
+                          borderRadius: 12,
+                          background: "#121212",
+                          cursor: "not-allowed",
+                        }}
+                      >
+                        <span style={{ fontSize: 13.5, fontWeight: 600, color: "#5e5e62", whiteSpace: "nowrap" }}>
+                          {t.title}
+                        </span>
+                        <span
+                          className="ca-mono"
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            letterSpacing: "0.08em",
+                            color: "#ff7a3d",
+                            border: "1px solid rgba(255,92,26,0.4)",
+                            borderRadius: 5,
+                            padding: "2px 5px",
+                          }}
+                        >
+                          ADMIN
+                        </span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={t.href}
+                      href={t.href}
+                      className="ca-dd-item"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textDecoration: "none",
+                        padding: "14px 18px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 12,
+                        background: "#1a1a1a",
+                      }}
+                    >
+                      <span style={{ fontSize: 13.5, fontWeight: 600, color: "#eaeaea", whiteSpace: "nowrap" }}>
+                        {t.title}
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -129,7 +169,7 @@ export default function SiteNav() {
       </div>
 
       <Link
-        href="/login"
+        href={authed ? "/dashboard" : "/login"}
         className="ca-btn-primary"
         style={{
           textDecoration: "none",
@@ -145,7 +185,7 @@ export default function SiteNav() {
           fontWeight: 700,
         }}
       >
-        로그인
+        {authed ? "대시보드" : "관리자 로그인"}
       </Link>
     </nav>
   );

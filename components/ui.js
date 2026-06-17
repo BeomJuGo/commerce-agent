@@ -42,7 +42,7 @@ export function Card({ children, className = "" }) {
 export function Button({ children, loading, className = "", ...props }) {
   return (
     <button
-      className={`ca-btn-primary inline-flex items-center justify-center gap-2 rounded-full bg-[#ff5c1a] px-5 py-2.5 font-semibold text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`ca-btn-primary inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#ff5c1a] px-5 py-2.5 font-semibold text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       disabled={loading || props.disabled}
       {...props}
     >

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SiteNav from "@/components/SiteNav";
 import { TOOLS } from "@/lib/tools";
+import { isLoggedIn } from "@/lib/auth-server";
 
 function SiteFooter() {
   return (
@@ -77,10 +78,11 @@ function SiteFooter() {
   );
 }
 
-export default function SiteLayout({ children }) {
+export default async function SiteLayout({ children }) {
+  const authed = await isLoggedIn();
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#0a0a0a", overflowX: "hidden" }}>
-      <SiteNav />
+      <SiteNav authed={authed} />
       <main style={{ flex: 1 }}>{children}</main>
       <SiteFooter />
     </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TOOLS, STRENGTHS, TECH_TOKENS } from "@/lib/tools";
+import { isLoggedIn } from "@/lib/auth-server";
 
 const TAG = {
   display: "inline-flex",
@@ -42,7 +43,8 @@ const BTN_GHOST = {
   fontWeight: 600,
 };
 
-export default function Home() {
+export default async function Home() {
+  const authed = await isLoggedIn();
   const techLoop = [...TECH_TOKENS, ...TECH_TOKENS];
 
   return (
@@ -195,11 +197,13 @@ export default function Home() {
           className="ca-reveal ca-tools-grid"
           style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18, marginTop: 44 }}
         >
-          {TOOLS.map((t) => (
-            <Link
+          {TOOLS.map((t) => {
+            const locked = t.href === "/dashboard" && !authed;
+            const Wrapper = locked ? "div" : Link;
+            return (
+            <Wrapper
               key={t.href}
-              href={t.href}
-              className="ca-card"
+              {...(locked ? { title: "관리자 로그인 후 이용 가능" } : { href: t.href, className: "ca-card" })}
               style={{
                 textDecoration: "none",
                 display: "flex",
@@ -209,6 +213,7 @@ export default function Home() {
                 borderRadius: 18,
                 padding: 28,
                 minHeight: 236,
+                ...(locked ? { opacity: 0.45, cursor: "not-allowed" } : {}),
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -256,8 +261,9 @@ export default function Home() {
                   </span>
                 ))}
               </div>
-            </Link>
-          ))}
+            </Wrapper>
+            );
+          })}
         </div>
       </section>
 
