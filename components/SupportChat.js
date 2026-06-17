@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { getCart } from "@/lib/cart";
+import { getCart, addToCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
 
 export default function SupportChat() {
@@ -12,7 +12,22 @@ export default function SupportChat() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [added, setAdded] = useState({});
   const endRef = useRef(null);
+
+  function addOne(p) {
+    addToCart({ pkey: p.pkey, title: p.title, image: p.image, lprice: p.lprice, mallName: p.mallName });
+    setAdded((a) => ({ ...a, [p.pkey]: true }));
+    setTimeout(
+      () =>
+        setAdded((a) => {
+          const n = { ...a };
+          delete n[p.pkey];
+          return n;
+        }),
+      1500
+    );
+  }
 
   useEffect(() => {
     let sid = localStorage.getItem("ca_sid");
@@ -88,25 +103,35 @@ export default function SupportChat() {
                 {m.products?.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {m.products.map((p) => (
-                      <Link
+                      <div
                         key={p.pkey}
-                        href={`/product/${encodeURIComponent(p.pkey)}?q=${encodeURIComponent(p.title || "")}`}
-                        onClick={() => setOpen(false)}
                         className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#141414] p-2 transition hover:border-[#ff5c1a]/50"
                       >
-                        {p.image ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image} alt="" className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
-                        ) : (
-                          <div className="ca-mono flex h-12 w-12 items-center justify-center rounded-lg bg-[#0e0e0e] text-[9px] text-[#6f6f72]">
-                            NO IMG
+                        <Link
+                          href={`/product/${encodeURIComponent(p.pkey)}?q=${encodeURIComponent(p.title || "")}`}
+                          onClick={() => setOpen(false)}
+                          className="flex min-w-0 flex-1 items-center gap-2"
+                        >
+                          {p.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image} alt="" className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
+                          ) : (
+                            <div className="ca-mono flex h-12 w-12 items-center justify-center rounded-lg bg-[#0e0e0e] text-[9px] text-[#6f6f72]">
+                              NO IMG
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="line-clamp-2 text-xs text-[#eaeaea]">{p.title}</p>
+                            <p className="text-xs font-semibold text-[#ff7a3d]">{formatPrice(p.lprice)}</p>
                           </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="line-clamp-2 text-xs text-[#eaeaea]">{p.title}</p>
-                          <p className="text-xs font-semibold text-[#ff7a3d]">{formatPrice(p.lprice)}</p>
-                        </div>
-                      </Link>
+                        </Link>
+                        <button
+                          onClick={() => addOne(p)}
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-[#ff5c1a]/40 px-2.5 py-1.5 text-xs font-medium text-[#ff7a3d] transition hover:bg-[#ff5c1a]/10"
+                        >
+                          {added[p.pkey] ? "담김 ✓" : "담기"}
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
