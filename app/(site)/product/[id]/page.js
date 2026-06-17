@@ -4,6 +4,7 @@ import { formatPrice } from "@/lib/format";
 import AddToCartBar from "@/components/AddToCartBar";
 import ProductGrid from "@/components/ProductGrid";
 import ProductReviews from "@/components/ProductReviews";
+import CurrentProductSignal from "@/components/CurrentProductSignal";
 
 export default async function ProductPage({ params, searchParams }) {
   const { id } = await params;
@@ -28,6 +29,7 @@ export default async function ProductPage({ params, searchParams }) {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
+      <CurrentProductSignal product={{ pkey: product.pkey, title: product.title, lprice: Number(product.lprice) || null }} />
       <Link href="/" className="ca-mono text-xs text-[#ff7a3d] hover:underline">
         ← 쇼핑 계속하기
       </Link>

@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { getCart } from "@/lib/cart";
+import { formatPrice } from "@/lib/format";
 
 export default function SupportChat() {
   const [open, setOpen] = useState(false);
   const [sessionId, setSessionId] = useState("");
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "안녕하세요! 상품 추천·가격·비교 무엇이든 물어보세요." },
+    { role: "assistant", content: "안녕하세요! 상품 추천·가격·비교 무엇이든 물어보세요. 지금 보고 계신 상품이나 장바구니에 대해서도 답해드려요." },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,13 +35,26 @@ export default function SupportChat() {
     setMessages((m) => [...m, { role: "user", content: text }]);
     setLoading(true);
     try {
+      const currentProduct = typeof window !== "undefined" ? window.__caCurrentProduct : null;
+      const cart = getCart()
+        .slice(0, 50)
+        .map((c) => ({ title: c.title, qty: c.qty, lprice: c.lprice }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, message: text, shopContext: "COMMERCE STORE" }),
+        body: JSON.stringify({
+          sessionId,
+          message: text,
+          shopContext: "COMMERCE STORE",
+          ...(currentProduct?.title ? { currentProduct } : {}),
+          ...(cart.length ? { cart } : {}),
+        }),
       });
       const d = await res.json().catch(() => ({}));
-      setMessages((m) => [...m, { role: "assistant", content: res.ok ? d.reply : d.error || "잠시 후 다시 시도해주세요." }]);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: res.ok ? d.reply : d.error || "잠시 후 다시 시도해주세요.", products: d.products || [] },
+      ]);
     } catch {
       setMessages((m) => [...m, { role: "assistant", content: "네트워크 오류가 발생했습니다." }]);
     } finally {
@@ -49,9 +65,7 @@ export default function SupportChat() {
   return (
     <>
       {open && (
-        <div
-          className="fixed bottom-24 right-5 z-[2147483000] flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] shadow-2xl"
-        >
+        <div className="fixed bottom-24 right-5 z-[2147483000] flex h-[540px] w-[370px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] shadow-2xl">
           <div className="flex items-center gap-2 bg-[#ff5c1a] px-4 py-3 text-[#0a0a0a]">
             <span className="ca-mono text-sm font-extrabold">AI</span>
             <div>
@@ -61,14 +75,41 @@ export default function SupportChat() {
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto px-3 py-4">
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
-                    m.role === "user" ? "bg-[#ff5c1a] text-[#0a0a0a]" : "border border-white/10 bg-[#141414] text-[#eaeaea]"
-                  }`}
-                >
-                  {m.content}
+              <div key={i}>
+                <div className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
+                      m.role === "user" ? "bg-[#ff5c1a] text-[#0a0a0a]" : "border border-white/10 bg-[#141414] text-[#eaeaea]"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
                 </div>
+                {m.products?.length > 0 && (
+                  <div className="mt-2 space-y-2">
+                    {m.products.map((p) => (
+                      <Link
+                        key={p.pkey}
+                        href={`/product/${encodeURIComponent(p.pkey)}?q=${encodeURIComponent(p.title || "")}`}
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#141414] p-2 transition hover:border-[#ff5c1a]/50"
+                      >
+                        {p.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.image} alt="" className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
+                        ) : (
+                          <div className="ca-mono flex h-12 w-12 items-center justify-center rounded-lg bg-[#0e0e0e] text-[9px] text-[#6f6f72]">
+                            NO IMG
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="line-clamp-2 text-xs text-[#eaeaea]">{p.title}</p>
+                          <p className="text-xs font-semibold text-[#ff7a3d]">{formatPrice(p.lprice)}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             {loading && (
