@@ -36,7 +36,9 @@ npm run dev
 | `OPENAI_MODEL` | 기본 `gpt-4o-mini` | 선택 |
 | `NAVER_CLIENT_ID` | 네이버 개발자센터 검색 API | 필수 |
 | `NAVER_CLIENT_SECRET` | 네이버 검색 API 시크릿 | 필수 |
-| `ADMIN_API_KEY` | `/api/dashboard` 보호용 Bearer 키 | 대시보드에 필요 |
+| `ADMIN_API_KEY` | 관리자 로그인 비밀번호 겸 `/api/dashboard` Bearer 키 | 대시보드에 필요 |
+| `ADMIN_PASSWORD` | 관리자 로그인 비밀번호(미설정 시 `ADMIN_API_KEY` 사용) | 선택 |
+| `SESSION_SECRET` | 세션 쿠키 서명 키(미설정 시 `ADMIN_API_KEY` 사용) | 선택 |
 
 > MongoDB 미설정 시: `links`/`dashboard`는 503으로 응답하고, `review` 캐시·`chat` 로그는 조용히 skip하며 본 기능은 동작합니다(graceful degradation).
 
@@ -54,6 +56,15 @@ API 라우트는 mongodb 드라이버를 사용하므로 Node.js 런타임에서
 모든 `/api` 라우트에 IP 기반 경량 레이트리밋(`lib/rateLimit.js`)이 적용되어 있습니다(GPT 라우트 10/분, dashboard 20/분, links 30/분). 공유 OpenAI·네이버 키 할당량을 캐주얼 남용으로부터 보호하기 위한 1차 방어선입니다.
 
 > 서버리스에서는 인스턴스별 인메모리라 **best-effort**입니다. 트래픽이 많거나 하드 제한이 필요하면 **Vercel WAF rate rules**를 함께 사용하세요. 키 노출 위험이 크면 이 프로젝트 전용 OpenAI/네이버 키를 별도 발급하는 것을 권장합니다.
+
+### 관리자 로그인
+
+`/dashboard` 등 관리자 기능은 로그인 후에만 접근할 수 있습니다.
+
+- `/login`에서 비밀번호 입력 → 검증 시 서명된 httpOnly 세션 쿠키(24h) 발급
+- `proxy.js`(Next.js Proxy)가 `/dashboard` 접근을 가로채 미인증 시 `/login`으로 리다이렉트
+- 비밀번호는 `ADMIN_PASSWORD`(없으면 `ADMIN_API_KEY`), 쿠키 서명은 `SESSION_SECRET`(없으면 `ADMIN_API_KEY`)
+- `/api/dashboard`는 세션 쿠키 **또는** `Authorization: Bearer <ADMIN_API_KEY>`(프로그램 접근) 허용
 
 ## 고객 응대 위젯 삽입
 

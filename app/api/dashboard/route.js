@@ -1,17 +1,20 @@
 // 대화 로그 기반 고객 니즈 분석 대시보드 (ADMIN_API_KEY 보호, GET)
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
-import { parseQuery, checkAdmin, handleError } from "@/lib/validate";
+import { parseQuery, handleError } from "@/lib/validate";
 import { dashboardQuerySchema } from "@/lib/schemas";
 import { chatJSON } from "@/lib/openai";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
+import { isAuthed } from "@/lib/auth";
 
 export async function GET(req) {
   const limited = rateLimit(req, { name: "dashboard", max: 20, windowMs: 60000 });
   if (limited) return limited;
-  const auth = checkAdmin(req);
-  if (auth) return auth;
+  // 세션 쿠키 또는 Bearer ADMIN_API_KEY(프로그램 접근) 허용
+  if (!isAuthed(req)) {
+    return NextResponse.json({ error: "Unauthorized", message: "로그인이 필요합니다." }, { status: 401 });
+  }
 
   const { searchParams } = new URL(req.url);
   const { data, response } = parseQuery(dashboardQuerySchema, searchParams);

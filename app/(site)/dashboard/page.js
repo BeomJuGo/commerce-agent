@@ -1,25 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { PageHeader, Card, Button, ErrorBox, Field, inputClass } from "@/components/ui";
+import { PageHeader, Card, Button, ErrorBox } from "@/components/ui";
 
 const COLORS = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4", "#a855f7"];
 
 export default function DashboardPage() {
-  const [key, setKey] = useState("");
   const [days, setDays] = useState("7");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState(null);
 
-  async function load(e) {
-    e.preventDefault();
+  async function load(d = days) {
     setLoading(true);
     setError("");
-    setData(null);
     try {
-      const res = await fetch(`/api/dashboard?days=${days}`, { headers: { Authorization: `Bearer ${key}` } });
+      const res = await fetch(`/api/dashboard?days=${d}`);
       const json = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        window.location.href = "/login?from=/dashboard";
+        return;
+      }
       if (!res.ok) throw new Error(json.message || json.error || "조회 실패");
       setData(json);
     } catch (err) {
@@ -29,29 +30,53 @@ export default function DashboardPage() {
     }
   }
 
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  }
+
   return (
     <div>
-      <PageHeader
-        emoji="📊"
-        title="고객 니즈 분석 대시보드"
-        description="고객 응대 위젯의 대화 로그를 분석해 인텐트 분포와 핵심 니즈를 시각화합니다. (관리자 키 필요)"
-      />
+      <div className="flex items-start justify-between">
+        <PageHeader
+          emoji="📊"
+          title="고객 니즈 분석 대시보드"
+          description="고객 응대 위젯의 대화 로그를 분석해 인텐트 분포와 핵심 니즈를 시각화합니다."
+        />
+        <button onClick={logout} className="mt-1 whitespace-nowrap text-sm text-gray-400 hover:text-red-600">
+          로그아웃
+        </button>
+      </div>
+
       <Card className="mb-6">
-        <form onSubmit={load} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <Field label="관리자 API 키 (ADMIN_API_KEY)">
-              <input className={inputClass} type="password" value={key} onChange={(e) => setKey(e.target.value)} required />
-            </Field>
-          </div>
-          <Field label="기간(일)">
-            <input className={inputClass} type="number" value={days} onChange={(e) => setDays(e.target.value)} min={1} max={90} />
-          </Field>
-          <Button type="submit" loading={loading}>
-            불러오기
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-gray-700">기간(일)</span>
+            <select
+              value={days}
+              onChange={(e) => setDays(e.target.value)}
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 outline-none focus:border-indigo-500"
+            >
+              {["1", "7", "14", "30", "90"].map((d) => (
+                <option key={d} value={d}>
+                  최근 {d}일
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button onClick={() => load(days)} loading={loading}>
+            새로고침
           </Button>
-        </form>
+        </div>
       </Card>
+
       <ErrorBox message={error} />
+
       {data && (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
@@ -127,6 +152,10 @@ export default function DashboardPage() {
                 </Card>
               )}
             </div>
+          )}
+
+          {data.totalMessages === 0 && (
+            <p className="text-sm text-gray-500">아직 분석할 대화 로그가 없습니다. 위젯에서 대화가 쌓이면 표시됩니다.</p>
           )}
         </div>
       )}
