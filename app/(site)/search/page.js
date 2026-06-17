@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getListing } from "@/lib/products";
+import { getListing, getMergedListing } from "@/lib/products";
 import { categoryBySlug } from "@/lib/store";
 import ProductGrid from "@/components/ProductGrid";
 
@@ -13,16 +13,30 @@ const SORTS = [
 export default async function SearchPage({ searchParams }) {
   const sp = await searchParams;
   const cat = sp.cat ? categoryBySlug(sp.cat) : null;
-  const q = String(sp.q || cat?.q || "").trim();
+
+  if (cat) {
+    // 카테고리: 여러 키워드 병합 진열 (정렬 토글 없음)
+    const products = await getMergedListing(`cat:${cat.slug}:full`, cat.queries, { perQuery: 6 });
+    return (
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{cat.label}</h1>
+        <p className="mt-1 text-sm text-[#86868a]">{products.length}개 상품 · {cat.queries.join(" · ")}</p>
+        <div className="mt-6">
+          <ProductGrid products={products} />
+        </div>
+      </div>
+    );
+  }
+
+  const q = String(sp.q || "").trim();
   const sort = ["sim", "asc", "dsc", "date"].includes(sp.sort) ? sp.sort : "sim";
-  const key = cat ? `cat:${cat.slug}:${sort}` : `search:${q}:${sort}`;
+  const key = `search:${q}:${sort}`;
   const products = q ? await getListing(key, q, { display: 24, sort }) : [];
-  const title = cat ? cat.label : q ? `“${q}” 검색 결과` : "검색";
-  const base = cat ? `cat=${cat.slug}` : `q=${encodeURIComponent(q)}`;
+  const base = `q=${encodeURIComponent(q)}`;
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{title}</h1>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{q ? `“${q}” 검색 결과` : "검색"}</h1>
       <p className="mt-1 text-sm text-[#86868a]">{products.length}개 상품</p>
 
       <div className="mb-6 mt-4 flex flex-wrap gap-2">

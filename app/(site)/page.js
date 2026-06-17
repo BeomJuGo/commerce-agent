@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/store";
-import { getListing } from "@/lib/products";
+import { getMergedListing } from "@/lib/products";
+import { getSeasonalCuration } from "@/lib/curate";
 import ProductGrid from "@/components/ProductGrid";
 import AIRecommend from "@/components/AIRecommend";
 
 export default async function StoreHome() {
-  // 카테고리별 rail (TTL 캐시 — 쿼터 보호)
+  // 카테고리별 rail — 여러 키워드 병합 + TTL 캐시(쿼터 보호)
   const rails = await Promise.all(
     CATEGORIES.map(async (c) => ({
       ...c,
-      products: (await getListing(`cat:${c.slug}`, c.q, { display: 8 })).slice(0, 8),
+      products: (await getMergedListing(`cat:${c.slug}`, c.queries, { perQuery: 3 })).slice(0, 8),
     }))
   );
+  const curation = await getSeasonalCuration().catch(() => null);
 
   return (
     <div>
@@ -46,6 +48,28 @@ export default async function StoreHome() {
       {/* 카테고리 rails */}
       <div className="mx-auto max-w-6xl space-y-12 px-6 py-12">
         <AIRecommend />
+
+        {curation?.themes?.some((t) => t.products?.length) && (
+          <section>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <span className="ca-mono rounded-md border border-[#ff5c1a]/40 px-2 py-0.5 text-[11px] text-[#ff7a3d]">큐레이션</span>
+              <h2 className="text-lg font-bold text-[#fafafa]">{curation.title || "이번 시즌 추천"}</h2>
+            </div>
+            {curation.intro && <p className="mb-5 text-sm text-[#9a9a9d]">{curation.intro}</p>}
+            <div className="space-y-8">
+              {curation.themes
+                .filter((t) => t.products?.length)
+                .map((t, i) => (
+                  <div key={i}>
+                    <h3 className="font-semibold text-[#fafafa]">{t.theme}</h3>
+                    {t.description && <p className="mb-3 text-sm text-[#909093]">{t.description}</p>}
+                    <ProductGrid products={t.products} />
+                  </div>
+                ))}
+            </div>
+          </section>
+        )}
+
         {rails.map((r) => (
           <section key={r.slug}>
             <div className="mb-4 flex items-end justify-between">
