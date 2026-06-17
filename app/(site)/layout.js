@@ -38,7 +38,7 @@ function SiteFooter() {
           >
             {[
               ["SOURCE", "네이버 쇼핑 API", "#c8c8cc"],
-              ["MODEL", "gpt-4o-mini", "#c8c8cc"],
+              ["MODEL", "gpt-5.5", "#c8c8cc"],
               ["STACK", "Next.js", "#c8c8cc"],
             ].map(([k, v, c]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between" }}>

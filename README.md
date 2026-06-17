@@ -33,7 +33,7 @@ npm run dev
 | `MONGODB_URI` | MongoDB Atlas 연결 문자열 | 링크/대시보드/캐시에 필요 |
 | `MONGODB_DB` | DB 이름 (URI에 없을 때) | 선택 |
 | `OPENAI_API_KEY` | OpenAI API 키 | 필수 |
-| `OPENAI_MODEL` | 기본 `gpt-4o-mini` | 선택 |
+| `OPENAI_MODEL` | 기본 `gpt-5.5` | 선택 |
 | `NAVER_CLIENT_ID` | 네이버 개발자센터 검색 API | 필수 |
 | `NAVER_CLIENT_SECRET` | 네이버 검색 API 시크릿 | 필수 |
 | `ADMIN_API_KEY` | 관리자 로그인 비밀번호 겸 `/api/dashboard` Bearer 키 | 대시보드에 필요 |

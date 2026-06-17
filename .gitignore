@@ -44,3 +44,6 @@ next-env.d.ts
 
 # playwright screenshots
 .playwright-mcp/
+
+# 예시 env는 추적 (시크릿 없음)
+!.env.local.example

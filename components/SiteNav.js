@@ -74,10 +74,9 @@ export default function SiteNav() {
               <div
                 style={{
                   display: "flex",
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                  maxWidth: 760,
+                  flexDirection: "row",
                   gap: 8,
+                  width: "max-content",
                   background: "#141414",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 16,
