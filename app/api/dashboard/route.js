@@ -68,7 +68,7 @@ export async function GET(req) {
               `"trends":"최근 경향 요약","gaps":"아직 충족되지 않은 니즈/기회"}`,
           },
         ],
-        { maxTokens: 1000 }
+        { maxTokens: 2800 }
       );
     }
 

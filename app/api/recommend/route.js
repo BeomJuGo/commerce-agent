@@ -17,31 +17,35 @@ export async function POST(req) {
 
   const { situation, budget } = data;
   try {
-    // 1) 자연어 상황 → 검색 의도/키워드 추출
+    // 1) 자연어 상황 → 상품 유형/키워드/필수조건/제외대상 추출
     const intent = await chatJSON([
       {
         role: "user",
         content:
           `사용자의 쇼핑 상황: "${situation}"${budget ? `\n예산: ${budget}원` : ""}\n` +
-          `네이버 쇼핑 검색에 사용할 정보를 JSON으로 추출하세요.\n` +
-          `형식: {"keywords":["검색어1","검색어2","검색어3"],"category":"대분류","mustHave":["필수 조건1","필수 조건2"]}\n` +
-          `keywords는 실제 검색에 쓸 2~4개의 구체적인 한국어 상품 검색어로 작성하세요.`,
+          `네이버 쇼핑 검색·선별에 쓸 정보를 JSON으로 추출하세요.\n` +
+          `형식: {"productType":"사용자가 찾는 핵심 상품 한 단어/구(예: 공기청정기)",` +
+          `"keywords":["구체 검색어1","검색어2","검색어3"],"mustHave":["필수 조건"],` +
+          `"avoid":["이 상황에서 제외할 상품/유형 키워드(예: 차량용, 가습기, 필터 단품, 청소기)"]}\n` +
+          `keywords는 본품을 찾기 위한 2~4개의 구체적 한국어 검색어. avoid는 사용자 의도와 다른 유형/부속품을 가리키는 단어들.`,
       },
-    ]);
+    ],
+    { maxTokens: 1500 });
 
+    const productType = intent.productType || "";
     const keywords =
       Array.isArray(intent.keywords) && intent.keywords.length ? intent.keywords.slice(0, 4) : [situation];
 
-    // 2) 키워드별 네이버 검색 → 후보 수집(중복/예산초과 제거)
+    // 2) 키워드별 네이버 검색 — 항상 관련도(sim)순, 후보 폭넓게 수집
     const seen = new Set();
     const candidates = [];
     for (const kw of keywords) {
-      const items = await searchShop(kw, { display: 6, sort: budget ? "asc" : "sim" });
+      const items = await searchShop(kw, { display: 10, sort: "sim" });
       for (const it of items) {
         const key = it.productId || it.link;
         if (!key || seen.has(key)) continue;
         seen.add(key);
-        if (budget && it.lprice && it.lprice > budget * 1.2) continue;
+        if (budget && it.lprice && it.lprice > budget * 1.3) continue; // 예산 초과만 제외(저가 잡동사니는 GPT가 걸러냄)
         candidates.push(it);
       }
     }
@@ -56,23 +60,32 @@ export async function POST(req) {
       });
     }
 
-    // 3) 후보를 GPT에 넘겨 상황 적합도 랭킹
+    // 3) 후보를 GPT에 넘겨 엄격히 선별(유형 불일치·부속품·비현실적 저가 제외)
     const brief = candidates
       .slice(0, 24)
-      .map((c, i) => ({ id: i, title: c.title, price: c.lprice, mall: c.mallName }));
+      .map((c, i) => ({ id: i, title: c.title, price: c.lprice }));
     const ranked = await chatJSON(
       [
         {
           role: "user",
           content:
-            `상황: "${situation}"${budget ? ` / 예산 ${budget}원` : ""}\n` +
-            `필수조건: ${(intent.mustHave || []).join(", ") || "없음"}\n` +
-            `후보 상품(JSON): ${JSON.stringify(brief)}\n` +
-            `상황 적합도가 높은 순으로 최대 8개를 골라 JSON으로 응답하세요.\n` +
-            `형식: {"ranked":[{"id":후보id,"reason":"추천 이유(40자 이내)","fitScore":0~100}],"summary":"전체 추천 요약 2문장"}`,
+            `사용자 상황: "${situation}"\n` +
+            `원하는 상품 유형: ${productType || "(상황에서 판단)"}\n` +
+            (budget ? `예산: ${budget}원\n` : "") +
+            `필수 조건: ${(intent.mustHave || []).join(", ") || "없음"}\n` +
+            (intent.avoid?.length ? `제외 대상 키워드: ${intent.avoid.join(", ")}\n` : "") +
+            `\n아래 네이버 쇼핑 후보(JSON: id/title/price)를 다음 기준으로 '엄격히' 선별하세요.\n` +
+            `1) 원하는 상품 유형의 '본품'이 아닌 것은 제외: 유형 불일치(예: 공기청정기를 원하는데 가습기·차량용),` +
+            ` 부속품·소모품·필터 단품·액세서리·청소도구·장난감/미니어처.\n` +
+            `2) 가격이 해당 본품으로 보기엔 비현실적으로 낮은 것 제외(예: 공기청정기인데 수천 원 이하).\n` +
+            `3) 상황·필수조건에 맞지 않는 것 제외.\n` +
+            `4) 남은 것만 적합도(fitScore) 높은 순으로. 억지로 개수를 채우지 말고, 적합한 게 없으면 ranked를 빈 배열로.\n\n` +
+            `후보: ${JSON.stringify(brief)}\n` +
+            `형식: {"ranked":[{"id":후보id,"reason":"왜 적합한지 30자 이내","fitScore":0~100}],` +
+            `"summary":"추천 요약 1~2문장(적합 상품이 없거나 부족하면 그 사실을 솔직히)"}`,
         },
       ],
-      { maxTokens: 1000 }
+      { maxTokens: 4000 } // gpt-5.5는 reasoning이 토큰을 함께 소비 → 출력 잘림 방지로 넉넉히
     );
 
     const products = (ranked.ranked || [])
@@ -81,7 +94,9 @@ export async function POST(req) {
         if (!p) return null;
         return { ...p, pkey: productKey(p), reason: r.reason, fitScore: r.fitScore };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      // 낮은 적합도(잡동사니가 끼어든 경우) 컷
+      .filter((p) => p.fitScore == null || p.fitScore >= 45);
 
     // 추천 상품을 캐시에 저장 → 상세/장바구니에서 클릭 가능
     await cacheProducts(products);

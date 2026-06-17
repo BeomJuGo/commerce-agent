@@ -49,7 +49,7 @@ export async function POST(req) {
             `reviews는 정확히 5개, 긍정·부정이 섞이도록 현실적으로 작성하세요.`,
         },
       ],
-      { maxTokens: 1300 }
+      { maxTokens: 2800 } // gpt-5.5 reasoning + 5리뷰 출력 여유
     );
 
     const reviews = Array.isArray(analysis.reviews)
