@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader, Card, Button, ErrorBox, Field, inputClass, postJSON, formatPrice } from "@/components/ui";
 import Sparkline from "@/components/Sparkline";
 
@@ -15,6 +15,14 @@ export default function SourcingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [board, setBoard] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/trends")
+      .then((r) => r.json())
+      .then((d) => setBoard(d.board || []))
+      .catch(() => setBoard([]));
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
@@ -37,8 +45,35 @@ export default function SourcingPage() {
       <PageHeader
         eyebrow="SOURCING"
         title="상품 소싱 아이디어"
-        description="분야/키워드를 입력하면 소싱 아이디어와 함께 현재 시장의 가격대·경쟁강도 신호를 제안합니다."
+        description="분야/키워드를 입력하면 소싱 아이디어와 함께 현재 시장의 가격대·경쟁강도·검색 트렌드·마진 신호를 제안합니다."
       />
+
+      {board && board.length > 0 && (
+        <Card className="mb-6">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="ca-mono rounded-md border border-[#ff5c1a]/40 px-2 py-0.5 text-[11px] text-[#ff7a3d]">지금 뜨는 검색 트렌드</span>
+            <span className="text-xs text-[#86868a]">최근 추세가 좋은 순 · 클릭하면 키워드로 입력</span>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {board.slice(0, 10).map((t) => (
+              <button
+                key={t.keyword}
+                type="button"
+                onClick={() => setKeyword(t.keyword)}
+                className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2 text-left transition hover:border-[#ff5c1a]/50"
+              >
+                <span className="min-w-0 flex-1 truncate text-sm text-[#eaeaea]">{t.keyword}</span>
+                <span className="ca-mono whitespace-nowrap text-xs font-semibold" style={{ color: dirStyle(t.direction).color }}>
+                  {t.direction} {t.momentum > 0 ? "+" : ""}
+                  {t.momentum}%
+                </span>
+                <Sparkline series={t.series} width={84} height={26} />
+              </button>
+            ))}
+          </div>
+        </Card>
+      )}
+
       <Card className="mb-6">
         <form onSubmit={submit} className="space-y-4">
           <Field label="분야 / 키워드">
