@@ -100,6 +100,33 @@ export default function SourcingPage() {
                 <p className="ca-mono mt-3 text-[10px] text-[#5e5e62]">검색 트렌드 데이터 없음</p>
               )}
 
+              {it.margin && it.margin.marginPct != null && (
+                <div className="mt-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                    <span className="text-[#909093]">예상 사입가<span className="text-[#5e5e62]">(추정)</span> <b className="text-[#c8c8cc]">{formatPrice(it.margin.estCost)}</b></span>
+                    <span className="text-[#909093]">시장 평균가 <b className="text-[#c8c8cc]">{formatPrice(it.margin.sellPrice)}</b></span>
+                    <span className="text-[#909093]">예상 마진율 <b className="text-[#ff7a3d]">{it.margin.marginPct}%</b></span>
+                    {it.margin.target != null && (
+                      <span
+                        className="ca-mono rounded-md px-2 py-0.5 font-semibold"
+                        style={
+                          it.margin.targetMet
+                            ? { color: "#5fbf8a", border: "1px solid rgba(95,191,138,0.4)" }
+                            : { color: "#ff6b6b", border: "1px solid rgba(255,107,107,0.4)" }
+                        }
+                      >
+                        목표 {it.margin.target}% {it.margin.targetMet ? "달성 가능" : "미달"}
+                      </span>
+                    )}
+                  </div>
+                  {it.margin.target != null && !it.margin.targetMet && (
+                    <p className="ca-mono mt-1.5 text-[11px] text-[#86868a]">
+                      목표 달성: 사입가 ≤ {formatPrice(it.margin.requiredCost)} 또는 판매가 ≥ {formatPrice(it.margin.requiredSell)}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {it.market && it.market.avg != null && (
                 <p className="ca-mono mt-2 text-xs text-[#6f6f72]">
                   시장가 {formatPrice(it.market.min)} ~ {formatPrice(it.market.max)} (평균 {formatPrice(it.market.avg)}) · 경쟁 {it.market.competition}
