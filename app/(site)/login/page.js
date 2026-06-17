@@ -23,8 +23,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <PageHeader emoji="🔐" title="관리자 로그인" description="대시보드 등 관리자 기능은 로그인 후 이용할 수 있습니다." />
+    <div className="mx-auto max-w-md px-6 py-20">
+      <PageHeader
+        eyebrow="ADMIN"
+        title="관리자 로그인"
+        description="대시보드 등 관리자 기능은 로그인 후 이용할 수 있습니다."
+      />
       <Card>
         <form onSubmit={submit} className="space-y-4">
           <Field label="비밀번호">

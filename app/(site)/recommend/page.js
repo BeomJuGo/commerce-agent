@@ -26,9 +26,9 @@ export default function RecommendPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader
-        emoji="🎯"
+        eyebrow="RECOMMEND"
         title="상황 기반 상품 추천"
         description="상황을 자연어로 설명하면 AI가 키워드를 뽑아 네이버 쇼핑에서 딱 맞는 상품을 추천합니다."
       />
@@ -63,9 +63,9 @@ export default function RecommendPage() {
         <div className="space-y-4">
           {result.summary && (
             <Card>
-              <p className="text-gray-800">💡 {result.summary}</p>
+              <p className="text-[#eaeaea]">{result.summary}</p>
               {result.keywords?.length > 0 && (
-                <p className="mt-2 text-xs text-gray-500">검색 키워드: {result.keywords.join(", ")}</p>
+                <p className="ca-mono mt-2 text-xs text-[#6f6f72]">검색 키워드: {result.keywords.join(", ")}</p>
               )}
             </Card>
           )}
@@ -74,7 +74,7 @@ export default function RecommendPage() {
               <ProductCard key={i} product={p} />
             ))}
           </div>
-          {result.products?.length === 0 && <p className="text-gray-500">추천 상품이 없습니다.</p>}
+          {result.products?.length === 0 && <p className="text-[#86868a]">추천 상품이 없습니다.</p>}
         </div>
       )}
     </div>

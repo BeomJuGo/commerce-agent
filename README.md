@@ -13,7 +13,7 @@ Next.js(App Router) 풀스택 단일 프로젝트로, 네이버 쇼핑 API와 Op
 | `/widget` · `/widget-demo` | 쇼핑몰 고객 응대 AI 위젯 | `POST /api/chat` |
 | `/dashboard` | 대화 로그 기반 고객 니즈 분석 (관리자) | `GET /api/dashboard` |
 | `/sourcing` | 상품 소싱 아이디어 추천 | `POST /api/sourcing` |
-| `/links` | 네이버 상품 링크 관리 (CRUD) | `GET/POST/DELETE /api/links` |
+| `/links` | 쿠팡/자사몰 링크 관리 (URL 붙여넣기 → OG 보강, CRUD) | `GET/POST/DELETE /api/links` |
 | `/curation` | 여행/계절/라이프스타일 큐레이션 | `POST /api/curation` |
 
 공통 흐름: **자연어 입력 → GPT로 의도/키워드 추출 → 네이버 쇼핑 검색 → GPT로 정렬/요약/판단 → 결과 반환(+필요 시 MongoDB 저장)**.
@@ -79,3 +79,5 @@ API 라우트는 mongodb 드라이버를 사용하므로 Node.js 런타임에서
 ## 기술 스택
 
 Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · MongoDB · zod · winston · recharts · 네이버 쇼핑 API · OpenAI
+
+디자인: 다크 프리미엄 + 오렌지(#ff5c1a) 단일 악센트, Pretendard + JetBrains Mono, 모노스페이스 악센트(ZERO STUDIO 톤).

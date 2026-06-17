@@ -30,9 +30,9 @@ export default function CurationPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-5xl px-6 py-12">
       <PageHeader
-        emoji="🧳"
+        eyebrow="CURATION"
         title="라이프스타일 큐레이션"
         description="여행·계절·라이프스타일 맥락을 입력하면 테마별로 상품을 큐레이션합니다."
       />
@@ -45,8 +45,10 @@ export default function CurationPage() {
                   type="button"
                   key={v}
                   onClick={() => setType(v)}
-                  className={`rounded-xl border px-4 py-2 text-sm ${
-                    type === v ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-gray-300 text-gray-600"
+                  className={`rounded-xl border px-4 py-2 text-sm transition ${
+                    type === v
+                      ? "border-[#ff5c1a] bg-[#ff5c1a]/15 text-[#ff7a3d]"
+                      : "border-white/10 text-[#9a9a9d] hover:border-white/25"
                   }`}
                 >
                   {label}
@@ -73,14 +75,14 @@ export default function CurationPage() {
         <div className="space-y-6">
           {(result.title || result.intro) && (
             <Card>
-              <h2 className="text-lg font-semibold text-gray-900">{result.title}</h2>
-              <p className="mt-1 text-gray-600">{result.intro}</p>
+              <h2 className="text-lg font-semibold text-[#fafafa]">{result.title}</h2>
+              <p className="mt-1 text-[#9a9a9d]">{result.intro}</p>
             </Card>
           )}
           {result.themes?.map((t, i) => (
             <div key={i}>
-              <h3 className="font-semibold text-gray-900">{t.theme}</h3>
-              <p className="mb-3 text-sm text-gray-600">{t.description}</p>
+              <h3 className="font-semibold text-[#fafafa]">{t.theme}</h3>
+              <p className="mb-3 text-sm text-[#909093]">{t.description}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {t.products?.map((p, j) => (
                   <ProductCard key={j} product={p} />

@@ -31,9 +31,9 @@ export default function ComparePage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-5xl px-6 py-12">
       <PageHeader
-        emoji="⚖️"
+        eyebrow="COMPARE"
         title="비교 · 구매 판단"
         description="여러 상품명을 입력하면 가격대와 장단점을 비교해 무엇을 살지 판단을 도와줍니다."
       />
@@ -48,7 +48,7 @@ export default function ComparePage() {
             type="button"
             onClick={() => setNames((p) => [...p, ""])}
             disabled={names.length >= 5}
-            className="text-sm text-indigo-600 hover:underline disabled:text-gray-400"
+            className="text-sm text-[#ff7a3d] hover:underline disabled:text-[#6f6f72]"
           >
             + 상품 추가
           </button>
@@ -70,10 +70,10 @@ export default function ComparePage() {
         <div className="space-y-4">
           {result.verdict && (
             <Card>
-              <p className="font-medium text-gray-900">🧠 종합 판단</p>
-              <p className="mt-1 text-gray-700">{result.verdict}</p>
+              <p className="ca-mono text-xs tracking-widest text-[#6f6f72]">VERDICT</p>
+              <p className="mt-2 text-[#eaeaea]">{result.verdict}</p>
               {result.winner && (
-                <p className="mt-2 text-sm text-indigo-600">
+                <p className="mt-2 text-sm text-[#ff7a3d]">
                   추천: {result.winner.name} — {result.winner.why}
                 </p>
               )}
@@ -85,16 +85,16 @@ export default function ComparePage() {
                 <div className="flex gap-3">
                   {p.image && <img src={p.image} alt="" className="h-16 w-16 rounded object-cover" />}
                   <div>
-                    <a href={p.link} target="_blank" rel="noreferrer" className="font-medium text-gray-900 hover:text-indigo-600">
+                    <a href={p.link} target="_blank" rel="noreferrer" className="font-medium text-[#eaeaea] hover:text-[#ff7a3d]">
                       {p.name}
                     </a>
-                    <p className="text-sm text-indigo-600">{formatPrice(p.lprice)}</p>
+                    <p className="text-sm text-[#ff7a3d]">{formatPrice(p.lprice)}</p>
                   </div>
                 </div>
                 {p.pros?.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-xs font-semibold text-green-700">장점</p>
-                    <ul className="list-disc pl-5 text-sm text-gray-700">
+                    <p className="text-xs font-semibold text-emerald-400">장점</p>
+                    <ul className="list-disc pl-5 text-sm text-[#b8b8bc]">
                       {p.pros.map((x, j) => (
                         <li key={j}>{x}</li>
                       ))}
@@ -103,15 +103,15 @@ export default function ComparePage() {
                 )}
                 {p.cons?.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-xs font-semibold text-red-700">단점</p>
-                    <ul className="list-disc pl-5 text-sm text-gray-700">
+                    <p className="text-xs font-semibold text-red-400">단점</p>
+                    <ul className="list-disc pl-5 text-sm text-[#b8b8bc]">
                       {p.cons.map((x, j) => (
                         <li key={j}>{x}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-                {p.bestFor && <p className="mt-2 text-xs text-gray-500">👤 {p.bestFor}</p>}
+                {p.bestFor && <p className="mt-2 text-xs text-[#86868a]">{p.bestFor}</p>}
               </Card>
             ))}
           </div>

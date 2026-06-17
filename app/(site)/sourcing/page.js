@@ -26,9 +26,9 @@ export default function SourcingPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader
-        emoji="💡"
+        eyebrow="SOURCING"
         title="상품 소싱 아이디어"
         description="분야/키워드를 입력하면 소싱 아이디어와 함께 현재 시장의 가격대·경쟁강도 신호를 제안합니다."
       />
@@ -63,19 +63,19 @@ export default function SourcingPage() {
           {result.ideas?.map((it, i) => (
             <Card key={i}>
               <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold text-gray-900">{it.idea}</h3>
+                <h3 className="font-semibold text-[#fafafa]">{it.idea}</h3>
                 {it.market && (
-                  <span className="whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  <span className="whitespace-nowrap rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs text-[#9a9a9d]">
                     경쟁 {it.market.competition}
                   </span>
                 )}
               </div>
-              {it.rationale && <p className="mt-1 text-sm text-gray-700">📌 {it.rationale}</p>}
-              {it.demandSignal && <p className="mt-1 text-sm text-gray-600">📈 수요: {it.demandSignal}</p>}
-              {it.riskNote && <p className="mt-1 text-sm text-gray-500">⚠️ {it.riskNote}</p>}
+              {it.rationale && <p className="mt-2 text-sm text-[#b8b8bc]">{it.rationale}</p>}
+              {it.demandSignal && <p className="mt-1 text-sm text-[#909093]">수요: {it.demandSignal}</p>}
+              {it.riskNote && <p className="mt-1 text-sm text-[#86868a]">리스크: {it.riskNote}</p>}
               {it.market && it.market.avg != null && (
-                <p className="mt-2 text-xs text-gray-500">
-                  현재 시장가: {formatPrice(it.market.min)} ~ {formatPrice(it.market.max)} (평균 {formatPrice(it.market.avg)})
+                <p className="ca-mono mt-2 text-xs text-[#6f6f72]">
+                  시장가 {formatPrice(it.market.min)} ~ {formatPrice(it.market.max)} (평균 {formatPrice(it.market.avg)})
                 </p>
               )}
             </Card>

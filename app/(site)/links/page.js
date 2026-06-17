@@ -3,7 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import { PageHeader, Card, Button, ErrorBox, Field, inputClass, postJSON, formatPrice } from "@/components/ui";
 
 export default function LinksPage() {
-  const [query, setQuery] = useState("");
+  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState("");
   const [memo, setMemo] = useState("");
   const [tags, setTags] = useState("");
   const [links, setLinks] = useState([]);
@@ -35,12 +36,14 @@ export default function LinksPage() {
     setLoading(true);
     setError("");
     try {
-      const body = { query };
+      const body = { url };
+      if (title) body.title = title;
       if (memo) body.memo = memo;
       const t = tags.split(",").map((s) => s.trim()).filter(Boolean);
       if (t.length) body.tags = t;
       await postJSON("/api/links", body);
-      setQuery("");
+      setUrl("");
+      setTitle("");
       setMemo("");
       setTags("");
       await load();
@@ -58,11 +61,11 @@ export default function LinksPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader
-        emoji="🔗"
-        title="네이버 상품 링크 관리"
-        description="검색어를 입력하면 네이버 쇼핑에서 제목·가격·이미지를 보강해 저장하고 태그로 관리합니다."
+        eyebrow="LINKS"
+        title="쿠팡/자사몰 링크 관리 도우미"
+        description="쿠팡·자사몰 상품 URL을 붙여넣으면 제목·이미지·가격을 자동 보강해 저장하고 태그로 관리합니다."
       />
       {dbOff ? (
         <ErrorBox message="MongoDB가 설정되지 않아 링크 저장 기능을 사용할 수 없습니다. (.env의 MONGODB_URI 설정 필요)" />
@@ -70,23 +73,26 @@ export default function LinksPage() {
         <>
           <Card className="mb-6">
             <form onSubmit={add} className="space-y-3">
-              <Field label="상품 검색어">
+              <Field label="상품 URL" hint="쿠팡·자사몰 등 상품 페이지 주소를 붙여넣으세요.">
                 <input
                   className={inputClass}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="예: 무선 이어폰"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://www.coupang.com/vp/products/..."
                   required
                 />
               </Field>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="메모 (선택)">
-                  <input className={inputClass} value={memo} onChange={(e) => setMemo(e.target.value)} />
+                <Field label="제목 (선택, 미입력 시 자동 추출)">
+                  <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} />
                 </Field>
                 <Field label="태그 (쉼표 구분, 선택)">
                   <input className={inputClass} value={tags} onChange={(e) => setTags(e.target.value)} placeholder="가전, 추천" />
                 </Field>
               </div>
+              <Field label="메모 (선택)">
+                <input className={inputClass} value={memo} onChange={(e) => setMemo(e.target.value)} />
+              </Field>
               <Button type="submit" loading={loading}>
                 저장
               </Button>
@@ -99,28 +105,35 @@ export default function LinksPage() {
                 <div className="flex items-start gap-3">
                   {l.image && <img src={l.image} alt="" className="h-16 w-16 rounded object-cover" />}
                   <div className="min-w-0 flex-1">
-                    <a href={l.url || "#"} target="_blank" rel="noreferrer" className="font-medium text-gray-900 hover:text-indigo-600">
-                      {l.title || l.query}
-                    </a>
-                    {l.lprice != null && <p className="text-sm text-indigo-600">{formatPrice(l.lprice)}</p>}
-                    {l.memo && <p className="text-sm text-gray-600">📝 {l.memo}</p>}
+                    <div className="flex items-center gap-2">
+                      {l.source && (
+                        <span className="ca-mono rounded border border-[#ff5c1a]/30 bg-[#ff5c1a]/10 px-1.5 py-0.5 text-[10px] text-[#ff7a3d]">
+                          {l.source}
+                        </span>
+                      )}
+                      <a href={l.url || "#"} target="_blank" rel="noreferrer" className="truncate font-medium text-[#eaeaea] hover:text-[#ff7a3d]">
+                        {l.title}
+                      </a>
+                    </div>
+                    {l.price != null && <p className="mt-0.5 text-sm text-[#ff7a3d]">{formatPrice(l.price)}</p>}
+                    {l.memo && <p className="mt-0.5 text-sm text-[#909093]">{l.memo}</p>}
                     {l.tags?.length > 0 && (
                       <div className="mt-1 flex flex-wrap gap-1">
                         {l.tags.map((t) => (
-                          <span key={t} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                          <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs text-[#9a9a9d]">
                             #{t}
                           </span>
                         ))}
                       </div>
                     )}
                   </div>
-                  <button onClick={() => remove(l.id)} className="text-sm text-gray-400 hover:text-red-600">
+                  <button onClick={() => remove(l.id)} className="ca-mono text-xs text-[#6f6f72] hover:text-red-400">
                     삭제
                   </button>
                 </div>
               </Card>
             ))}
-            {links.length === 0 && <p className="text-sm text-gray-500">저장된 링크가 없습니다.</p>}
+            {links.length === 0 && <p className="text-sm text-[#86868a]">저장된 링크가 없습니다.</p>}
           </div>
         </>
       )}

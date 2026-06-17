@@ -1,10 +1,10 @@
-// 네이버 상품 링크 관리 도우미 (links 컬렉션 CRUD)
+// 쿠팡/자사몰 링크 관리 도우미 (links 컬렉션 CRUD, OG 메타 보강)
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { parseBody, parseQuery, handleError } from "@/lib/validate";
 import { linksPostSchema, linksQuerySchema, linksDeleteQuerySchema } from "@/lib/schemas";
-import { searchShop } from "@/lib/naver";
+import { fetchOg, detectSource } from "@/lib/og";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
 import logger from "@/lib/logger";
@@ -27,27 +27,18 @@ export async function POST(req) {
   const db = await getDatabase();
   if (!db) return NO_DB();
   try {
-    // query가 있으면 네이버 검색으로 제목·가격·이미지 보강
-    let enriched = {};
-    if (data.query) {
-      const items = await searchShop(data.query, { display: 1 });
-      const top = items[0];
-      if (top) {
-        enriched = {
-          title: top.title,
-          image: top.image,
-          lprice: top.lprice,
-          naverLink: top.link,
-          mallName: top.mallName,
-        };
-      }
-    }
+    // 붙여넣은 URL의 OG 메타(제목·이미지·가격)로 보강 (쿠팡 등 차단 시 graceful)
+    const og = await fetchOg(data.url);
+    const source = detectSource(data.url);
     const doc = {
-      url: data.url || enriched.naverLink || null,
-      query: data.query || null,
+      url: data.url,
+      source,
+      title: data.title || og.title || data.url,
+      image: og.image || null,
+      price: og.price ?? null,
       memo: data.memo || null,
       tags: data.tags || [],
-      ...enriched,
+      enriched: !!(og.title || og.image),
       createdAt: new Date(),
     };
     const r = await db.collection("links").insertOne(doc);
@@ -73,7 +64,8 @@ export async function GET(req) {
       filter.$or = [
         { title: { $regex: data.q, $options: "i" } },
         { memo: { $regex: data.q, $options: "i" } },
-        { query: { $regex: data.q, $options: "i" } },
+        { source: { $regex: data.q, $options: "i" } },
+        { url: { $regex: data.q, $options: "i" } },
       ];
     }
     const links = await db.collection("links").find(filter).sort({ createdAt: -1 }).limit(100).toArray();
