@@ -10,7 +10,7 @@ export default async function StoreHome() {
   const rails = await Promise.all(
     CATEGORIES.map(async (c) => ({
       ...c,
-      products: (await getMergedListing(`cat:${c.slug}:mix`, c.queries, { perQuery: 3 })).slice(0, 8),
+      products: (await getMergedListing(`cat:${c.slug}:mix:v2`, c.queries.slice(0, 2), { perQuery: 5 })).slice(0, 8),
     }))
   );
   const curation = await getSeasonalCuration().catch(() => null);
