@@ -1,5 +1,6 @@
 import Link from "next/link";
 import StoreNav from "@/components/StoreNav";
+import SupportChat from "@/components/SupportChat";
 import { CATEGORIES } from "@/lib/store";
 import { isLoggedIn } from "@/lib/auth-server";
 
@@ -69,6 +70,7 @@ export default async function SiteLayout({ children }) {
       <StoreNav authed={authed} />
       <main style={{ flex: 1 }}>{children}</main>
       <StoreFooter />
+      <SupportChat />
     </div>
   );
 }

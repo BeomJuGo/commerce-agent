@@ -71,7 +71,7 @@ export default function StoreNav({ authed = false }) {
             )}
           </Link>
           <Link
-            href={authed ? "/dashboard" : "/login"}
+            href={authed ? "/admin" : "/login"}
             className="whitespace-nowrap rounded-full bg-white/[0.06] px-4 py-2 text-sm font-medium text-[#eaeaea] hover:bg-white/[0.12]"
           >
             {authed ? "관리자" : "관리자 로그인"}

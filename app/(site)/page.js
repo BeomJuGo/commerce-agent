@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CATEGORIES } from "@/lib/store";
 import { getListing } from "@/lib/products";
 import ProductGrid from "@/components/ProductGrid";
+import AIRecommend from "@/components/AIRecommend";
 
 export default async function StoreHome() {
   // 카테고리별 rail (TTL 캐시 — 쿼터 보호)
@@ -44,6 +45,7 @@ export default async function StoreHome() {
 
       {/* 카테고리 rails */}
       <div className="mx-auto max-w-6xl space-y-12 px-6 py-12">
+        <AIRecommend />
         {rails.map((r) => (
           <section key={r.slug}>
             <div className="mb-4 flex items-end justify-between">

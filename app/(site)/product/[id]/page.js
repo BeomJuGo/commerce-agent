@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { getProduct } from "@/lib/products";
+import { getProduct, getListing } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
 import AddToCartBar from "@/components/AddToCartBar";
+import ProductGrid from "@/components/ProductGrid";
+import ProductReviews from "@/components/ProductReviews";
 
 export default async function ProductPage({ params, searchParams }) {
   const { id } = await params;
@@ -18,6 +20,11 @@ export default async function ProductPage({ params, searchParams }) {
       </div>
     );
   }
+
+  // 비슷한 상품(유사 상품 비교용) — 제목 앞 토큰으로 검색, TTL 캐시
+  const simQuery = (product.title || "").split(/\s+/).slice(0, 3).join(" ");
+  const similarRaw = simQuery ? await getListing(`sim:${product.pkey}`, simQuery, { display: 10 }) : [];
+  const similar = similarRaw.filter((p) => p.pkey !== product.pkey).slice(0, 8);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -65,6 +72,17 @@ export default async function ProductPage({ params, searchParams }) {
           </p>
         </div>
       </div>
+
+      {/* AI 리뷰 분석 (버튼 클릭 시 호출) */}
+      <ProductReviews productName={product.title} />
+
+      {/* 비슷한 상품 비교 */}
+      {similar.length > 0 && (
+        <section className="mt-12 border-t border-white/[0.07] pt-8">
+          <h2 className="mb-4 text-lg font-bold text-[#fafafa]">비슷한 상품</h2>
+          <ProductGrid products={similar} />
+        </section>
+      )}
     </div>
   );
 }

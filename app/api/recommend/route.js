@@ -6,6 +6,7 @@ import { recommendSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
 import { rateLimit } from "@/lib/rateLimit";
+import { productKey, cacheProducts } from "@/lib/products";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
@@ -78,9 +79,12 @@ export async function POST(req) {
       .map((r) => {
         const p = candidates[r.id];
         if (!p) return null;
-        return { ...p, reason: r.reason, fitScore: r.fitScore };
+        return { ...p, pkey: productKey(p), reason: r.reason, fitScore: r.fitScore };
       })
       .filter(Boolean);
+
+    // 추천 상품을 캐시에 저장 → 상세/장바구니에서 클릭 가능
+    await cacheProducts(products);
 
     return NextResponse.json({
       situation,

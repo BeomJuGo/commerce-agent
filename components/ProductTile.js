@@ -30,6 +30,11 @@ export default function ProductTile({ product }) {
           <p className="line-clamp-2 min-h-[2.5rem] text-sm text-[#eaeaea]">{product.title}</p>
           <p className="mt-1 text-base font-bold text-[#ff7a3d]">{formatPrice(product.lprice)}</p>
           {product.mallName && <p className="mt-0.5 text-xs text-[#86868a]">{product.mallName}</p>}
+          {product.reason && (
+            <p className="mt-1.5 line-clamp-2 rounded-md bg-[#ff5c1a]/10 px-2 py-1 text-xs text-[#ff9d6e]">
+              AI · {product.reason}
+            </p>
+          )}
         </div>
       </Link>
       <div className="px-3 pb-3">

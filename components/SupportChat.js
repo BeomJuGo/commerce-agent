@@ -1,0 +1,104 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+
+export default function SupportChat() {
+  const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "안녕하세요! 상품 추천·가격·비교 무엇이든 물어보세요." },
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    let sid = localStorage.getItem("ca_sid");
+    if (!sid) {
+      sid = (crypto.randomUUID && crypto.randomUUID()) || `s_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem("ca_sid", sid);
+    }
+    setSessionId(sid);
+  }, []);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading, open]);
+
+  async function send(e) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput("");
+    setMessages((m) => [...m, { role: "user", content: text }]);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, message: text, shopContext: "COMMERCE STORE" }),
+      });
+      const d = await res.json().catch(() => ({}));
+      setMessages((m) => [...m, { role: "assistant", content: res.ok ? d.reply : d.error || "잠시 후 다시 시도해주세요." }]);
+    } catch {
+      setMessages((m) => [...m, { role: "assistant", content: "네트워크 오류가 발생했습니다." }]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <>
+      {open && (
+        <div
+          className="fixed bottom-24 right-5 z-[2147483000] flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] shadow-2xl"
+        >
+          <div className="flex items-center gap-2 bg-[#ff5c1a] px-4 py-3 text-[#0a0a0a]">
+            <span className="ca-mono text-sm font-extrabold">AI</span>
+            <div>
+              <p className="text-sm font-semibold leading-tight">상담원</p>
+              <p className="text-[11px] opacity-70">COMMERCE STORE</p>
+            </div>
+          </div>
+          <div className="flex-1 space-y-3 overflow-y-auto px-3 py-4">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
+                    m.role === "user" ? "bg-[#ff5c1a] text-[#0a0a0a]" : "border border-white/10 bg-[#141414] text-[#eaeaea]"
+                  }`}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="rounded-2xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#6f6f72]">입력 중…</div>
+              </div>
+            )}
+            <div ref={endRef} />
+          </div>
+          <form onSubmit={send} className="flex gap-2 border-t border-white/10 p-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="메시지를 입력하세요…"
+              className="flex-1 rounded-xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#f4f4f3] placeholder:text-[#6f6f72] outline-none focus:border-[#ff5c1a]"
+            />
+            <button type="submit" disabled={loading} className="rounded-xl bg-[#ff5c1a] px-3 py-2 text-sm font-semibold text-[#0a0a0a] disabled:opacity-50">
+              전송
+            </button>
+          </form>
+        </div>
+      )}
+
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-label="AI 상담"
+        className="ca-btn-primary fixed bottom-5 right-5 z-[2147483000] flex h-14 items-center gap-2 rounded-full bg-[#ff5c1a] px-5 font-semibold text-[#0a0a0a] shadow-2xl"
+      >
+        {open ? "✕ 닫기" : "AI 상담"}
+      </button>
+    </>
+  );
+}

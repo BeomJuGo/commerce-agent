@@ -6,6 +6,7 @@ import { curationSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
 import { rateLimit } from "@/lib/rateLimit";
+import { productKey, cacheProducts } from "@/lib/products";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
@@ -35,7 +36,9 @@ export async function POST(req) {
     for (const t of (themeRes.themes || []).slice(0, 5)) {
       let products = [];
       try {
-        products = await searchShop(t.searchKeyword || t.theme, { display: 4 });
+        const items = await searchShop(t.searchKeyword || t.theme, { display: 4 });
+        products = items.map((it) => ({ ...it, pkey: productKey(it) }));
+        await cacheProducts(products);
       } catch (_) {}
       themes.push({ theme: t.theme, description: t.description, products });
     }
