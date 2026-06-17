@@ -1,6 +1,13 @@
 "use client";
 import { useState } from "react";
 import { PageHeader, Card, Button, ErrorBox, Field, inputClass, postJSON, formatPrice } from "@/components/ui";
+import Sparkline from "@/components/Sparkline";
+
+function dirStyle(dir) {
+  if (dir === "상승") return { color: "#5fbf8a", border: "rgba(95,191,138,0.4)" };
+  if (dir === "하락") return { color: "#ff6b6b", border: "rgba(255,107,107,0.4)" };
+  return { color: "#9a9a9d", border: "rgba(255,255,255,0.15)" };
+}
 
 export default function SourcingPage() {
   const [keyword, setKeyword] = useState("");
@@ -71,11 +78,31 @@ export default function SourcingPage() {
                 )}
               </div>
               {it.rationale && <p className="mt-2 text-sm text-[#b8b8bc]">{it.rationale}</p>}
-              {it.demandSignal && <p className="mt-1 text-sm text-[#909093]">수요: {it.demandSignal}</p>}
+              {it.demandSignal && <p className="mt-1 text-sm text-[#909093]">수요(AI): {it.demandSignal}</p>}
               {it.riskNote && <p className="mt-1 text-sm text-[#86868a]">리스크: {it.riskNote}</p>}
+
+              {it.trend ? (
+                <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2">
+                  <span className="ca-mono text-[10px] tracking-wider text-[#6f6f72]">검색 트렌드 (데이터랩, 12개월)</span>
+                  <span
+                    className="ca-mono rounded-md px-2 py-0.5 text-xs font-semibold"
+                    style={{ color: dirStyle(it.trend.direction).color, border: `1px solid ${dirStyle(it.trend.direction).border}` }}
+                  >
+                    {it.trend.direction} {it.trend.momentum > 0 ? "+" : ""}
+                    {it.trend.momentum}%
+                  </span>
+                  {it.trend.peakMonth && <span className="text-xs text-[#909093]">피크 {it.trend.peakMonth}월</span>}
+                  <span className="ml-auto">
+                    <Sparkline series={it.trend.series} />
+                  </span>
+                </div>
+              ) : (
+                <p className="ca-mono mt-3 text-[10px] text-[#5e5e62]">검색 트렌드 데이터 없음</p>
+              )}
+
               {it.market && it.market.avg != null && (
                 <p className="ca-mono mt-2 text-xs text-[#6f6f72]">
-                  시장가 {formatPrice(it.market.min)} ~ {formatPrice(it.market.max)} (평균 {formatPrice(it.market.avg)})
+                  시장가 {formatPrice(it.market.min)} ~ {formatPrice(it.market.max)} (평균 {formatPrice(it.market.avg)}) · 경쟁 {it.market.competition}
                 </p>
               )}
             </Card>
