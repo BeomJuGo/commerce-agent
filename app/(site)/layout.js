@@ -1,59 +1,43 @@
 import Link from "next/link";
-import SiteNav from "@/components/SiteNav";
-import { TOOLS } from "@/lib/tools";
+import StoreNav from "@/components/StoreNav";
+import { CATEGORIES } from "@/lib/store";
 import { isLoggedIn } from "@/lib/auth-server";
 
-function SiteFooter() {
+function StoreFooter() {
   return (
     <footer style={{ borderTop: "1px solid rgba(255,255,255,0.07)", background: "#0c0c0c" }}>
-      <div className="ca-footer-grid" style={{ maxWidth: 1180, margin: "0 auto", padding: "64px 48px 40px" }}>
+      <div className="ca-footer-grid" style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 48px 40px" }}>
         <div>
-          <div style={{ fontSize: 19, letterSpacing: "-0.01em" }}>
+          <div style={{ fontSize: 18, letterSpacing: "-0.01em" }}>
             <span style={{ fontWeight: 800, color: "#fafafa" }}>COMMERCE</span>
-            <span style={{ fontWeight: 400, color: "#7d7d80" }}> AGENT</span>
+            <span style={{ fontWeight: 400, color: "#7d7d80" }}> STORE</span>
           </div>
-          <p style={{ margin: "16px 0 0", maxWidth: 320, fontSize: 14, lineHeight: 1.7, color: "#86868a" }}>
-            네이버 쇼핑과 OpenAI를 결합한 AI 커머스 에이전트. 탐색부터 판단, 응대, 데이터 구조화까지 한곳에서.
+          <p style={{ margin: "14px 0 0", maxWidth: 320, fontSize: 14, lineHeight: 1.7, color: "#86868a" }}>
+            네이버 쇼핑 상품을 AI가 추천·비교·분석해 주는 커머스 스토어. 상품은 네이버 쇼핑에서 실시간으로 제공됩니다.
           </p>
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fafafa", letterSpacing: "0.02em" }}>도구</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fafafa" }}>카테고리</div>
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 11 }}>
-            {TOOLS.map((t) => (
-              <Link
-                key={t.href}
-                href={t.href}
-                className="ca-link-muted"
-                style={{ fontSize: 14, color: "#909093", textDecoration: "none" }}
-              >
-                {t.title}
+            {CATEGORIES.map((c) => (
+              <Link key={c.slug} href={`/search?cat=${c.slug}`} className="ca-link-muted" style={{ fontSize: 14, color: "#909093", textDecoration: "none" }}>
+                {c.label}
               </Link>
             ))}
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fafafa", letterSpacing: "0.02em" }}>기술 스택</div>
-          <div
-            className="ca-mono"
-            style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12, fontSize: 13, color: "#86868a" }}
-          >
-            {[
-              ["SOURCE", "네이버 쇼핑 API", "#c8c8cc"],
-              ["MODEL", "gpt-5.5", "#c8c8cc"],
-              ["STACK", "Next.js", "#c8c8cc"],
-            ].map(([k, v, c]) => (
-              <div key={k} style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#5e5e62" }}>{k}</span>
-                <span style={{ color: c }}>{v}</span>
-              </div>
-            ))}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "#5e5e62" }}>STATUS</span>
-              <span style={{ color: "#5fbf8a", display: "flex", alignItems: "center", gap: 7 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#5fbf8a" }} />
-                ONLINE
-              </span>
-            </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fafafa" }}>안내</div>
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 11 }}>
+            <Link href="/cart" className="ca-link-muted" style={{ fontSize: 14, color: "#909093", textDecoration: "none" }}>
+              장바구니
+            </Link>
+            <Link href="/login" className="ca-link-muted" style={{ fontSize: 14, color: "#909093", textDecoration: "none" }}>
+              관리자 로그인
+            </Link>
+            <span className="ca-mono" style={{ fontSize: 12, color: "#5e5e62", marginTop: 6 }}>
+              결제는 데모(모의)로 동작합니다.
+            </span>
           </div>
         </div>
       </div>
@@ -70,8 +54,8 @@ function SiteFooter() {
             color: "#6f6f72",
           }}
         >
-          <span>© 2026 COMMERCE AGENT · Internal Demo</span>
-          <span className="ca-mono">v1.0</span>
+          <span>© 2026 COMMERCE STORE · Demo</span>
+          <span className="ca-mono">NAVER 쇼핑 · OpenAI</span>
         </div>
       </div>
     </footer>
@@ -82,9 +66,9 @@ export default async function SiteLayout({ children }) {
   const authed = await isLoggedIn();
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#0a0a0a", overflowX: "hidden" }}>
-      <SiteNav authed={authed} />
+      <StoreNav authed={authed} />
       <main style={{ flex: 1 }}>{children}</main>
-      <SiteFooter />
+      <StoreFooter />
     </div>
   );
 }

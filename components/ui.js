@@ -1,11 +1,9 @@
 "use client";
 // components/ui.js — 공용 클라이언트 UI 프리미티브 (다크 테마) + fetch 헬퍼
 import Link from "next/link";
+import { formatPrice } from "@/lib/format";
 
-export function formatPrice(n) {
-  if (n == null || Number.isNaN(Number(n))) return "가격정보 없음";
-  return `${Number(n).toLocaleString("ko-KR")}원`;
-}
+export { formatPrice };
 
 export async function postJSON(url, body) {
   const res = await fetch(url, {
