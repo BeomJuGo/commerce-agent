@@ -60,8 +60,10 @@ API 라우트는 mongodb 드라이버를 사용하므로 Node.js 런타임에서
 임의의 쇼핑몰 HTML에 아래 한 줄을 추가하면 우하단에 AI 상담 챗봇이 떠 응대합니다.
 
 ```html
-<script src="https://YOUR_DOMAIN/widget.js" data-shop="내 쇼핑몰 이름"></script>
+<script src="https://commerce-agent-ecru.vercel.app/widget.js" data-shop="내 쇼핑몰 이름"></script>
 ```
+
+> 라이브: **https://commerce-agent-ecru.vercel.app** · `/widget-demo`에서 실제 위젯과 자동 생성된 스니펫을 확인할 수 있습니다.
 
 ## 기술 스택
 
