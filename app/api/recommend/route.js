@@ -36,11 +36,13 @@ export async function POST(req) {
     const keywords =
       Array.isArray(intent.keywords) && intent.keywords.length ? intent.keywords.slice(0, 4) : [situation];
 
-    // 2) 키워드별 네이버 검색 — 항상 관련도(sim)순, 후보 폭넓게 수집
+    // 2) 키워드별 네이버 검색 — 병렬 호출(속도), 항상 관련도(sim)순
+    const searchResults = await Promise.all(
+      keywords.map((kw) => searchShop(kw, { display: 10, sort: "sim" }).catch(() => []))
+    );
     const seen = new Set();
     const candidates = [];
-    for (const kw of keywords) {
-      const items = await searchShop(kw, { display: 10, sort: "sim" });
+    for (const items of searchResults) {
       for (const it of items) {
         const key = it.productId || it.link;
         if (!key || seen.has(key)) continue;
