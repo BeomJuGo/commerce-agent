@@ -6,7 +6,7 @@ export default function AdminLogout() {
     window.location.href = "/";
   }
   return (
-    <button onClick={logout} className="ca-mono text-xs text-[#6f6f72] hover:text-red-400">
+    <button onClick={logout} className="ca-mono text-xs text-[#a1a1aa] hover:text-red-600">
       로그아웃
     </button>
   );

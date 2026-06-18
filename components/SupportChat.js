@@ -80,8 +80,8 @@ export default function SupportChat() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-24 right-5 z-[2147483000] flex h-[540px] w-[370px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] shadow-2xl">
-          <div className="flex items-center gap-2 bg-[#ff5c1a] px-4 py-3 text-[#0a0a0a]">
+        <div className="fixed bottom-24 right-5 z-[2147483000] flex h-[540px] w-[370px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-black/10 bg-[#f1f1f3] shadow-2xl">
+          <div className="flex items-center gap-2 bg-[#ff5c1a] px-4 py-3 text-white">
             <span className="ca-mono text-sm font-extrabold">AI</span>
             <div>
               <p className="text-sm font-semibold leading-tight">상담원</p>
@@ -94,7 +94,7 @@ export default function SupportChat() {
                 <div className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
-                      m.role === "user" ? "bg-[#ff5c1a] text-[#0a0a0a]" : "border border-white/10 bg-[#141414] text-[#eaeaea]"
+                      m.role === "user" ? "bg-[#ff5c1a] text-white" : "border border-black/10 bg-[#ffffff] text-[#27272a]"
                     }`}
                   >
                     {m.content}
@@ -105,7 +105,7 @@ export default function SupportChat() {
                     {m.products.map((p) => (
                       <div
                         key={p.pkey}
-                        className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#141414] p-2 transition hover:border-[#ff5c1a]/50"
+                        className="flex items-center gap-2 rounded-xl border border-black/10 bg-[#ffffff] p-2 transition hover:border-[#ff5c1a]/50"
                       >
                         <Link
                           href={`/product/${encodeURIComponent(p.pkey)}?q=${encodeURIComponent(p.title || "")}`}
@@ -116,18 +116,18 @@ export default function SupportChat() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={p.image} alt="" className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
                           ) : (
-                            <div className="ca-mono flex h-12 w-12 items-center justify-center rounded-lg bg-[#0e0e0e] text-[9px] text-[#6f6f72]">
+                            <div className="ca-mono flex h-12 w-12 items-center justify-center rounded-lg bg-[#f1f1f3] text-[9px] text-[#a1a1aa]">
                               NO IMG
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <p className="line-clamp-2 text-xs text-[#eaeaea]">{p.title}</p>
-                            <p className="text-xs font-semibold text-[#ff7a3d]">{formatPrice(p.lprice)}</p>
+                            <p className="line-clamp-2 text-xs text-[#27272a]">{p.title}</p>
+                            <p className="text-xs font-semibold text-[#e0480f]">{formatPrice(p.lprice)}</p>
                           </div>
                         </Link>
                         <button
                           onClick={() => addOne(p)}
-                          className="shrink-0 whitespace-nowrap rounded-lg border border-[#ff5c1a]/40 px-2.5 py-1.5 text-xs font-medium text-[#ff7a3d] transition hover:bg-[#ff5c1a]/10"
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-[#ff5c1a]/40 px-2.5 py-1.5 text-xs font-medium text-[#e0480f] transition hover:bg-[#ff5c1a]/10"
                         >
                           {added[p.pkey] ? "담김 ✓" : "담기"}
                         </button>
@@ -139,19 +139,19 @@ export default function SupportChat() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#6f6f72]">입력 중…</div>
+                <div className="rounded-2xl border border-black/10 bg-[#ffffff] px-3 py-2 text-sm text-[#a1a1aa]">입력 중…</div>
               </div>
             )}
             <div ref={endRef} />
           </div>
-          <form onSubmit={send} className="flex gap-2 border-t border-white/10 p-2">
+          <form onSubmit={send} className="flex gap-2 border-t border-black/10 p-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="메시지를 입력하세요…"
-              className="flex-1 rounded-xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#f4f4f3] placeholder:text-[#6f6f72] outline-none focus:border-[#ff5c1a]"
+              className="flex-1 rounded-xl border border-black/10 bg-[#ffffff] px-3 py-2 text-sm text-[#18181b] placeholder:text-[#a1a1aa] outline-none focus:border-[#ff5c1a]"
             />
-            <button type="submit" disabled={loading} className="rounded-xl bg-[#ff5c1a] px-3 py-2 text-sm font-semibold text-[#0a0a0a] disabled:opacity-50">
+            <button type="submit" disabled={loading} className="rounded-xl bg-[#ff5c1a] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
               전송
             </button>
           </form>
@@ -161,7 +161,7 @@ export default function SupportChat() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="AI 상담"
-        className="ca-btn-primary fixed bottom-5 right-5 z-[2147483000] flex h-14 items-center gap-2 rounded-full bg-[#ff5c1a] px-5 font-semibold text-[#0a0a0a] shadow-2xl"
+        className="ca-btn-primary fixed bottom-5 right-5 z-[2147483000] flex h-14 items-center gap-2 rounded-full bg-[#ff5c1a] px-5 font-semibold text-white shadow-2xl"
       >
         {open ? "✕ 닫기" : "AI 상담"}
       </button>

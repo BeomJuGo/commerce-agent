@@ -19,7 +19,7 @@ export default function Sparkline({ series, width = 130, height = 34 }) {
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
-      <polyline points={points} fill="none" stroke="#ff7a3d" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
+      <polyline points={points} fill="none" stroke="#e0480f" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={px} cy={py} r="2.2" fill="#ff5c1a" />
     </svg>
   );

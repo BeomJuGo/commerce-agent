@@ -23,7 +23,7 @@ function Pager({ base, cur, totalPages }) {
 
   const linkCls = (active) =>
     `inline-flex h-9 min-w-9 items-center justify-center rounded-lg border px-2 text-sm ${
-      active ? "border-[#ff5c1a] bg-[#ff5c1a] font-semibold text-[#0a0a0a]" : "border-white/10 text-[#c8c8cc] hover:border-white/25"
+      active ? "border-[#ff5c1a] bg-[#ff5c1a] font-semibold text-white" : "border-black/10 text-[#3f3f46] hover:border-black/25"
     }`;
 
   return (
@@ -33,13 +33,13 @@ function Pager({ base, cur, totalPages }) {
           이전
         </Link>
       )}
-      {start > 1 && <span className="text-[#6f6f72]">…</span>}
+      {start > 1 && <span className="text-[#a1a1aa]">…</span>}
       {nums.map((n) => (
         <Link key={n} href={`${base}&page=${n}`} className={linkCls(n === cur)}>
           {n}
         </Link>
       ))}
-      {end < totalPages && <span className="text-[#6f6f72]">…</span>}
+      {end < totalPages && <span className="text-[#a1a1aa]">…</span>}
       {cur < totalPages && (
         <Link href={`${base}&page=${cur + 1}`} className={linkCls(false)}>
           다음
@@ -67,8 +67,8 @@ export default async function SearchPage({ searchParams }) {
 
     return (
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{cat.label}</h1>
-        <p className="mt-1 text-sm text-[#86868a]">
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#18181b" }}>{cat.label}</h1>
+        <p className="mt-1 text-sm text-[#9a9aa2]">
           총 {all.length.toLocaleString("ko-KR")}개 상품 · {cur}/{totalPages} 페이지
         </p>
         <div className="mt-6">
@@ -89,8 +89,8 @@ export default async function SearchPage({ searchParams }) {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{q ? `“${q}” 검색 결과` : "검색"}</h1>
-      <p className="mt-1 text-sm text-[#86868a]">{all.length.toLocaleString("ko-KR")}개 상품</p>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#18181b" }}>{q ? `“${q}” 검색 결과` : "검색"}</h1>
+      <p className="mt-1 text-sm text-[#9a9aa2]">{all.length.toLocaleString("ko-KR")}개 상품</p>
 
       <div className="mb-6 mt-4 flex flex-wrap gap-2">
         {SORTS.map(([v, label]) => (
@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }) {
             key={v}
             href={`/search?q=${encodeURIComponent(q)}&sort=${v}`}
             className={`rounded-full border px-3 py-1.5 text-xs ${
-              sort === v ? "border-[#ff5c1a] text-[#ff7a3d]" : "border-white/10 text-[#9a9a9d] hover:border-white/25"
+              sort === v ? "border-[#ff5c1a] text-[#e0480f]" : "border-black/10 text-[#71717a] hover:border-black/25"
             }`}
           >
             {label}
@@ -112,7 +112,7 @@ export default async function SearchPage({ searchParams }) {
           <Pager base={base} cur={cur} totalPages={totalPages} />
         </>
       ) : (
-        <p className="text-sm text-[#86868a]">검색어를 입력하세요.</p>
+        <p className="text-sm text-[#9a9aa2]">검색어를 입력하세요.</p>
       )}
     </div>
   );

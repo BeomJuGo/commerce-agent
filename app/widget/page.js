@@ -47,22 +47,22 @@ export default function WidgetPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-[#0a0a0a]">
-      <header className="flex items-center gap-2 border-b border-white/10 bg-[#ff5c1a] px-4 py-3 text-[#0a0a0a]">
+    <div className="flex h-screen flex-col bg-[#f7f7f8]">
+      <header className="flex items-center gap-2 border-b border-black/10 bg-[#ff5c1a] px-4 py-3 text-white">
         <span className="ca-mono text-sm font-extrabold">AI</span>
         <div>
           <p className="text-sm font-semibold leading-tight">AI 상담원</p>
           <p className="text-xs opacity-70">{shop || "온라인 쇼핑몰"}</p>
         </div>
       </header>
-      <div className="flex-1 space-y-3 overflow-y-auto bg-[#0e0e0e] px-3 py-4">
+      <div className="flex-1 space-y-3 overflow-y-auto bg-[#f1f1f3] px-3 py-4">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
                 m.role === "user"
-                  ? "bg-[#ff5c1a] text-[#0a0a0a]"
-                  : "border border-white/10 bg-[#141414] text-[#eaeaea]"
+                  ? "bg-[#ff5c1a] text-white"
+                  : "border border-black/10 bg-[#ffffff] text-[#27272a]"
               }`}
             >
               {m.content}
@@ -71,24 +71,24 @@ export default function WidgetPage() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="rounded-2xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#6f6f72]">
+            <div className="rounded-2xl border border-black/10 bg-[#ffffff] px-3 py-2 text-sm text-[#a1a1aa]">
               입력 중…
             </div>
           </div>
         )}
         <div ref={endRef} />
       </div>
-      <form onSubmit={send} className="flex gap-2 border-t border-white/10 bg-[#0a0a0a] p-2">
+      <form onSubmit={send} className="flex gap-2 border-t border-black/10 bg-[#f7f7f8] p-2">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="메시지를 입력하세요…"
-          className="flex-1 rounded-xl border border-white/10 bg-[#141414] px-3 py-2 text-sm text-[#f4f4f3] placeholder:text-[#6f6f72] outline-none focus:border-[#ff5c1a]"
+          className="flex-1 rounded-xl border border-black/10 bg-[#ffffff] px-3 py-2 text-sm text-[#18181b] placeholder:text-[#a1a1aa] outline-none focus:border-[#ff5c1a]"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-[#ff5c1a] px-4 py-2 text-sm font-semibold text-[#0a0a0a] disabled:opacity-50"
+          className="rounded-xl bg-[#ff5c1a] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           전송
         </button>

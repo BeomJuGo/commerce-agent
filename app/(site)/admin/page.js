@@ -12,9 +12,9 @@ export default function AdminHub() {
     <div className="mx-auto max-w-5xl px-6 py-12">
       <div className="flex items-start justify-between">
         <div>
-          <span className="ca-mono text-xs tracking-widest text-[#6f6f72]">ADMIN</span>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#fafafa]">관리자</h1>
-          <p className="mt-2 text-[#9a9a9d]">스토어 운영 도구입니다. 로그인한 관리자만 접근할 수 있습니다.</p>
+          <span className="ca-mono text-xs tracking-widest text-[#a1a1aa]">ADMIN</span>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#18181b]">관리자</h1>
+          <p className="mt-2 text-[#71717a]">스토어 운영 도구입니다. 로그인한 관리자만 접근할 수 있습니다.</p>
         </div>
         <AdminLogout />
       </div>
@@ -24,11 +24,11 @@ export default function AdminHub() {
           <Link
             key={t.href}
             href={t.href}
-            className="ca-card flex flex-col rounded-2xl border border-white/[0.07] bg-[#141414] p-5"
+            className="ca-card flex flex-col rounded-2xl border border-black/[0.07] bg-[#ffffff] p-5"
           >
-            <span className="ca-mono text-xs text-[#6f6f72]">{t.en}</span>
-            <h2 className="mt-3 font-semibold text-[#fafafa]">{t.title}</h2>
-            <p className="mt-1 text-sm text-[#909093]">{t.desc}</p>
+            <span className="ca-mono text-xs text-[#a1a1aa]">{t.en}</span>
+            <h2 className="mt-3 font-semibold text-[#18181b]">{t.title}</h2>
+            <p className="mt-1 text-sm text-[#71717a]">{t.desc}</p>
           </Link>
         ))}
       </div>

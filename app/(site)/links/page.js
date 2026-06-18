@@ -104,13 +104,13 @@ export default function LinksPage() {
       />
 
       <Card className="mb-6">
-        <p className="text-sm leading-relaxed text-[#b8b8bc]">
-          <b className="text-[#fafafa]">이 도구로 할 수 있는 것</b>
+        <p className="text-sm leading-relaxed text-[#52525b]">
+          <b className="text-[#18181b]">이 도구로 할 수 있는 것</b>
           <br />· 추적할 상품 URL을 저장하고 <b>제목·이미지·가격을 자동 보강</b>(OG 지원 사이트)
           <br />· <b>가격 갱신</b>으로 시점별 가격을 기록 → <b>변동 추이</b>(▲▼)와 스파크라인 확인
           <br />· 태그·메모로 분류하고 검색으로 빠르게 찾기
         </p>
-        <p className="ca-mono mt-2 text-[11px] text-[#86868a]">
+        <p className="ca-mono mt-2 text-[11px] text-[#9a9aa2]">
           ※ 쿠팡은 봇 차단으로 자동 수집이 안 됩니다 → 제목·가격을 직접 입력하면 동일하게 추적됩니다. (무신사 등 OG 지원 자사몰은 자동)
         </p>
       </Card>
@@ -184,40 +184,40 @@ export default function LinksPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={l.image} alt="" className="h-16 w-16 flex-shrink-0 rounded object-cover" />
                     ) : (
-                      <div className="ca-mono flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-[#0e0e0e] text-[9px] text-[#6f6f72]">
+                      <div className="ca-mono flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-[#f1f1f3] text-[9px] text-[#a1a1aa]">
                         NO IMG
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {l.source && (
-                          <span className="ca-mono rounded border border-[#ff5c1a]/30 bg-[#ff5c1a]/10 px-1.5 py-0.5 text-[10px] text-[#ff7a3d]">
+                          <span className="ca-mono rounded border border-[#ff5c1a]/30 bg-[#ff5c1a]/10 px-1.5 py-0.5 text-[10px] text-[#e0480f]">
                             {l.source}
                           </span>
                         )}
-                        <a href={l.url || "#"} target="_blank" rel="noreferrer" className="truncate font-medium text-[#eaeaea] hover:text-[#ff7a3d]">
+                        <a href={l.url || "#"} target="_blank" rel="noreferrer" className="truncate font-medium text-[#27272a] hover:text-[#e0480f]">
                           {l.title}
                         </a>
                       </div>
 
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         {l.price != null ? (
-                          <span className="text-sm font-semibold text-[#ff7a3d]">{formatPrice(l.price)}</span>
+                          <span className="text-sm font-semibold text-[#e0480f]">{formatPrice(l.price)}</span>
                         ) : (
-                          <span className="text-xs text-[#6f6f72]">가격 미기록</span>
+                          <span className="text-xs text-[#a1a1aa]">가격 미기록</span>
                         )}
                         {ch && (
-                          <span className="ca-mono text-xs font-semibold" style={{ color: ch.up ? "#ff6b6b" : "#5aa9ff" }}>
+                          <span className="ca-mono text-xs font-semibold" style={{ color: ch.up ? "#dc2626" : "#2563eb" }}>
                             {ch.up ? "▲" : "▼"} {Math.abs(ch.pct)}%
                           </span>
                         )}
                         {series.length >= 2 && <Sparkline series={series} width={80} height={22} />}
-                        <button onClick={() => refreshPrice(l)} className="ca-mono rounded-md border border-white/10 px-2 py-0.5 text-[11px] text-[#c8c8cc] hover:border-[#ff5c1a]/50">
+                        <button onClick={() => refreshPrice(l)} className="ca-mono rounded-md border border-black/10 px-2 py-0.5 text-[11px] text-[#3f3f46] hover:border-[#ff5c1a]/50">
                           가격 갱신
                         </button>
                       </div>
 
-                      {l.memo && <p className="mt-1 text-sm text-[#909093]">{l.memo}</p>}
+                      {l.memo && <p className="mt-1 text-sm text-[#71717a]">{l.memo}</p>}
                       {l.tags?.length > 0 && (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {l.tags.map((t) => (
@@ -227,7 +227,7 @@ export default function LinksPage() {
                                 setQ(t);
                                 load(t);
                               }}
-                              className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs text-[#9a9a9d] hover:border-[#ff5c1a]/40"
+                              className="rounded-full border border-black/10 bg-black/[0.04] px-2 py-0.5 text-xs text-[#71717a] hover:border-[#ff5c1a]/40"
                             >
                               #{t}
                             </button>
@@ -235,14 +235,14 @@ export default function LinksPage() {
                         </div>
                       )}
                     </div>
-                    <button onClick={() => remove(l.id)} className="ca-mono text-xs text-[#6f6f72] hover:text-red-400">
+                    <button onClick={() => remove(l.id)} className="ca-mono text-xs text-[#a1a1aa] hover:text-red-600">
                       삭제
                     </button>
                   </div>
                 </Card>
               );
             })}
-            {links.length === 0 && <p className="text-sm text-[#86868a]">저장된 링크가 없습니다. 위에 상품 URL을 붙여넣어 추적을 시작하세요.</p>}
+            {links.length === 0 && <p className="text-sm text-[#9a9aa2]">저장된 링크가 없습니다. 위에 상품 URL을 붙여넣어 추적을 시작하세요.</p>}
           </div>
         </>
       )}

@@ -14,8 +14,8 @@ export default async function ProductPage({ params, searchParams }) {
   if (!product) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-        <p className="text-[#9a9a9d]">상품을 찾을 수 없습니다.</p>
-        <Link href="/" className="mt-3 inline-block text-[#ff7a3d]">
+        <p className="text-[#71717a]">상품을 찾을 수 없습니다.</p>
+        <Link href="/" className="mt-3 inline-block text-[#e0480f]">
           홈으로 →
         </Link>
       </div>
@@ -30,23 +30,23 @@ export default async function ProductPage({ params, searchParams }) {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <CurrentProductSignal product={{ pkey: product.pkey, title: product.title, lprice: Number(product.lprice) || null }} />
-      <Link href="/" className="ca-mono text-xs text-[#ff7a3d] hover:underline">
+      <Link href="/" className="ca-mono text-xs text-[#e0480f] hover:underline">
         ← 쇼핑 계속하기
       </Link>
       <div className="mt-4 grid gap-8 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0e0e0e]">
+        <div className="overflow-hidden rounded-2xl border border-black/[0.07] bg-[#f1f1f3]">
           {product.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={product.image} alt={product.title || ""} className="w-full object-cover" />
           ) : (
-            <div className="ca-mono flex aspect-square items-center justify-center text-xs text-[#6f6f72]">NO IMAGE</div>
+            <div className="ca-mono flex aspect-square items-center justify-center text-xs text-[#a1a1aa]">NO IMAGE</div>
           )}
         </div>
         <div>
-          {product.mallName && <span className="ca-mono text-xs text-[#6f6f72]">{product.mallName}</span>}
-          <h1 className="mt-2 text-xl font-bold leading-snug text-[#fafafa]">{product.title}</h1>
-          {product.category && <p className="mt-2 text-xs text-[#86868a]">{product.category}</p>}
-          <p className="mt-5 text-3xl font-extrabold text-[#ff7a3d]">{formatPrice(product.lprice)}</p>
+          {product.mallName && <span className="ca-mono text-xs text-[#a1a1aa]">{product.mallName}</span>}
+          <h1 className="mt-2 text-xl font-bold leading-snug text-[#18181b]">{product.title}</h1>
+          {product.category && <p className="mt-2 text-xs text-[#9a9aa2]">{product.category}</p>}
+          <p className="mt-5 text-3xl font-extrabold text-[#e0480f]">{formatPrice(product.lprice)}</p>
 
           <AddToCartBar
             product={{
@@ -64,12 +64,12 @@ export default async function ProductPage({ params, searchParams }) {
               href={product.link}
               target="_blank"
               rel="noreferrer"
-              className="mt-4 block text-sm text-[#9a9a9d] hover:text-[#ff7a3d]"
+              className="mt-4 block text-sm text-[#71717a] hover:text-[#e0480f]"
             >
               네이버 쇼핑에서 상세 보기 →
             </a>
           )}
-          <p className="ca-mono mt-6 text-[11px] leading-relaxed text-[#5e5e62]">
+          <p className="ca-mono mt-6 text-[11px] leading-relaxed text-[#b0b0b8]">
             ※ 결제는 데모(모의)로 동작합니다. 실제 구매는 네이버 판매처에서 진행됩니다.
           </p>
         </div>
@@ -80,8 +80,8 @@ export default async function ProductPage({ params, searchParams }) {
 
       {/* 비슷한 상품 비교 */}
       {similar.length > 0 && (
-        <section className="mt-12 border-t border-white/[0.07] pt-8">
-          <h2 className="mb-4 text-lg font-bold text-[#fafafa]">비슷한 상품</h2>
+        <section className="mt-12 border-t border-black/[0.07] pt-8">
+          <h2 className="mb-4 text-lg font-bold text-[#18181b]">비슷한 상품</h2>
           <ProductGrid products={similar} />
         </section>
       )}

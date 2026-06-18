@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --ca-bg: #0a0a0a;
-  --ca-fg: #f4f4f3;
+  --ca-bg: #f7f7f8;
+  --ca-fg: #18181b;
   --ca-accent: #ff5c1a;
 }
 
@@ -12,8 +12,8 @@ html {
 
 html,
 body {
-  background: #0a0a0a;
-  color: #f4f4f3;
+  background: #f7f7f8;
+  color: #18181b;
   font-family: "Pretendard Variable", Pretendard, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -42,22 +42,22 @@ body {
 
 /* ---- hover helpers (inline style로는 :hover 불가) ---- */
 .ca-card { transition: background .18s, border-color .18s, transform .18s; }
-.ca-card:hover { background: #1a1a1a; border-color: rgba(255, 92, 26, 0.4); transform: translateY(-4px); }
+.ca-card:hover { background: #f6f6f7; border-color: rgba(255, 92, 26, 0.4); transform: translateY(-4px); }
 
 .ca-btn-primary { transition: filter .15s, transform .15s; }
 .ca-btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
 .ca-btn-ghost { transition: background .15s, border-color .15s; }
-.ca-btn-ghost:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.3); }
+.ca-btn-ghost:hover { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.3); }
 
 .ca-dd-item { transition: background .14s, border-color .14s, transform .14s; }
-.ca-dd-item:hover { background: #212121; border-color: rgba(255, 92, 26, 0.45); transform: translateY(-2px); }
+.ca-dd-item:hover { background: #efeff1; border-color: rgba(255, 92, 26, 0.45); transform: translateY(-2px); }
 
 .ca-link-muted { transition: color .15s, background .15s; }
-.ca-link-muted:hover { color: #fafafa; }
+.ca-link-muted:hover { color: #18181b; }
 
 .ca-pill { transition: background .15s; }
-.ca-pill:hover { background: rgba(255, 255, 255, 0.16); }
+.ca-pill:hover { background: rgba(0, 0, 0, 0.16); }
 
 /* reveal: 스크롤 진입 시 페이드업 (view() 미지원 환경은 항상 보이도록 fallback) */
 @supports (animation-timeline: view()) {
