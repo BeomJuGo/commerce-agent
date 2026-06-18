@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { parseBody, handleError } from "@/lib/validate";
 import { chatSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
-import { chatText } from "@/lib/openai";
+import { chatText, FAST_MODEL } from "@/lib/openai";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
 import { productKey, cacheProducts } from "@/lib/products";
@@ -83,7 +83,8 @@ export async function POST(req) {
         productContext,
     };
     const msgs = [sys, ...history.map((h) => ({ role: h.role, content: h.content })), { role: "user", content: message }];
-    const reply = await chatText(msgs, { temperature: 0.6, maxTokens: 500 });
+    // 고객 응대는 빠른 모델로(지연 단축). 대화 품질엔 충분, 추론모델이면 temperature 자동 생략.
+    const reply = await chatText(msgs, { model: FAST_MODEL, temperature: 0.6, maxTokens: 500 });
 
     if (db) {
       const ts = new Date();
