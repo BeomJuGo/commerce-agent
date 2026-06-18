@@ -58,6 +58,24 @@ export default function AIRecommend() {
 
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
+      {loading && (
+        <div className="mt-5">
+          <p className="mb-4 text-sm text-[#9a9aa2]">AI가 상황에 맞는 상품을 고르고 있어요…</p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border border-black/[0.07] bg-[#ffffff]">
+                <div className="aspect-square w-full animate-pulse bg-black/[0.06]" />
+                <div className="space-y-2 p-3">
+                  <div className="h-3.5 w-full animate-pulse rounded bg-black/[0.06]" />
+                  <div className="h-3.5 w-2/3 animate-pulse rounded bg-black/[0.06]" />
+                  <div className="mt-1 h-4 w-1/3 animate-pulse rounded bg-black/[0.08]" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {result && (
         <div className="mt-5">
           {result.summary && <p className="mb-4 text-sm text-[#3f3f46]">{result.summary}</p>}
