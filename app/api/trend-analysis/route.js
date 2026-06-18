@@ -6,11 +6,14 @@ import { trendAnalysisSchema } from "@/lib/schemas";
 import { chatJSON } from "@/lib/openai";
 import { searchTrend } from "@/lib/datalab";
 import { rateLimit } from "@/lib/rateLimit";
+import { requireAdmin } from "@/lib/auth";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
   const limited = rateLimit(req, { name: "trend-analysis", max: 15, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { data, response } = await parseBody(trendAnalysisSchema, req);
   if (response) return response;
 

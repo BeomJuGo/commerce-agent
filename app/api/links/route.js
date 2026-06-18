@@ -7,6 +7,7 @@ import { linksPostSchema, linksQuerySchema, linksDeleteQuerySchema, linksPatchSc
 import { fetchOg, detectSource } from "@/lib/og";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
+import { requireAdmin } from "@/lib/auth";
 import logger from "@/lib/logger";
 
 async function getDatabase() {
@@ -22,6 +23,8 @@ const NO_DB = () => NextResponse.json({ error: "MongoDB 미설정", message: "�
 export async function POST(req) {
   const limited = rateLimit(req, { name: "links-write", max: 30, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { data, response } = await parseBody(linksPostSchema, req);
   if (response) return response;
   const db = await getDatabase();
@@ -56,6 +59,8 @@ export async function POST(req) {
 export async function GET(req) {
   const limited = rateLimit(req, { name: "links-read", max: 60, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { searchParams } = new URL(req.url);
   const { data, response } = parseQuery(linksQuerySchema, searchParams);
   if (response) return response;
@@ -86,6 +91,8 @@ export async function GET(req) {
 export async function PATCH(req) {
   const limited = rateLimit(req, { name: "links-write", max: 30, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { data, response } = await parseBody(linksPatchSchema, req);
   if (response) return response;
   const db = await getDatabase();
@@ -132,6 +139,8 @@ export async function PATCH(req) {
 export async function DELETE(req) {
   const limited = rateLimit(req, { name: "links-write", max: 30, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { searchParams } = new URL(req.url);
   const { data, response } = parseQuery(linksDeleteQuerySchema, searchParams);
   if (response) return response;

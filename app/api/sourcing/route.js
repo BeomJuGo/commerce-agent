@@ -7,11 +7,14 @@ import { searchShop, priceStats } from "@/lib/naver";
 import { chatJSON } from "@/lib/openai";
 import { searchTrend } from "@/lib/datalab";
 import { rateLimit } from "@/lib/rateLimit";
+import { requireAdmin } from "@/lib/auth";
 import logger from "@/lib/logger";
 
 export async function POST(req) {
   const limited = rateLimit(req, { name: "sourcing", max: 10, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   const { data, response } = await parseBody(sourcingSchema, req);
   if (response) return response;
 

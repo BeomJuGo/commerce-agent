@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { trendBoard } from "@/lib/datalab";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit } from "@/lib/rateLimit";
+import { requireAdmin } from "@/lib/auth";
 
 const SEED_KEYWORDS = [
   "무선이어폰", "캠핑용품", "골프용품", "홈카페", "반려동물용품",
@@ -14,6 +15,8 @@ const SEED_KEYWORDS = [
 export async function GET(req) {
   const limited = rateLimit(req, { name: "trends", max: 30, windowMs: 60000 });
   if (limited) return limited;
+  const denied = requireAdmin(req);
+  if (denied) return denied;
 
   const key = "trends:board:v1";
   let db = null;
