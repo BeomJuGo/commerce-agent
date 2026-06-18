@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { parseBody, handleError } from "@/lib/validate";
 import { recommendSchema } from "@/lib/schemas";
-import { searchShop } from "@/lib/naver";
+import { searchShop, dedupListings } from "@/lib/naver";
 import { chatJSON, FAST_MODEL } from "@/lib/openai";
 import { rateLimit } from "@/lib/rateLimit";
 import { productKey, cacheProducts } from "@/lib/products";
@@ -19,15 +19,10 @@ export async function POST(req) {
   try {
     // 1) 상황을 바로 검색(의도추출 GPT 생략 → 속도). 관련도순으로 후보 폭넓게 수집.
     const items = await searchShop(situation, { display: 18, sort: "sim" }).catch(() => []);
-    const seen = new Set();
-    const candidates = [];
-    for (const it of items) {
-      const key = it.productId || it.link;
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      if (budget && it.lprice && it.lprice > budget * 1.3) continue; // 예산 초과만 제외(저가 잡동사니는 GPT가 걸러냄)
-      candidates.push(it);
-    }
+    // 같은 상품의 중복 리스팅 제거 후 예산 필터
+    const candidates = dedupListings(items).filter(
+      (it) => !(budget && it.lprice && it.lprice > budget * 1.3) // 예산 초과만 제외(저가 잡동사니는 GPT가 걸러냄)
+    );
 
     if (!candidates.length) {
       return NextResponse.json({
