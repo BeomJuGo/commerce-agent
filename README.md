@@ -1,83 +1,163 @@
-# AI 커머스 에이전트
+# COMMERCE STORE — AI 커머스 스토어
 
-자연어 입력 기반으로 상품 탐색·추천·비교·구매판단·고객응대·데이터 구조화를 해주는 **AI 커머스 에이전트** 서비스입니다.
-Next.js(App Router) 풀스택 단일 프로젝트로, 네이버 쇼핑 API와 OpenAI를 결합해 8가지 커머스 도구를 제공합니다.
+## 1. 서비스명 및 한 줄 소개
 
-## 기능
+**COMMERCE STORE** — 네이버 쇼핑의 실시간 상품을 **AI가 추천·비교·분석**해 주고, 자연어로 상담까지 해 주는 커머스 스토어입니다. 셀러를 위한 소싱·트렌드 분석 도구도 함께 제공합니다.
 
-| 경로 | 기능 | API |
-| --- | --- | --- |
-| `/recommend` | 상황 기반 상품 추천 | `POST /api/recommend` |
-| `/compare` | 상품 비교·구매 판단 | `POST /api/compare` |
-| `/review` | 리뷰 요약·장단점 분석 (Mongo 캐시) | `POST /api/review` |
-| `/widget` · `/widget-demo` | 쇼핑몰 고객 응대 AI 위젯 | `POST /api/chat` |
-| `/dashboard` | 대화 로그 기반 고객 니즈 분석 (관리자) | `GET /api/dashboard` |
-| `/sourcing` | 상품 소싱 아이디어 추천 | `POST /api/sourcing` |
-| `/links` | 쿠팡/자사몰 링크 관리 (URL 붙여넣기 → OG 보강, CRUD) | `GET/POST/DELETE /api/links` |
-| `/curation` | 여행/계절/라이프스타일 큐레이션 | `POST /api/curation` |
+- 🌐 라이브: **https://commerce-agent-ecru.vercel.app**
 
-공통 흐름: **자연어 입력 → GPT로 의도/키워드 추출 → 네이버 쇼핑 검색 → GPT로 정렬/요약/판단 → 결과 반환(+필요 시 MongoDB 저장)**.
+---
 
-## 로컬 실행
+## 2. 문제 정의
+
+온라인 쇼핑에서 **상품 탐색 → 비교 → 구매 판단 → 고객 응대**가 여러 채널·도구에 흩어져 있어 비효율적입니다. 또한 **셀러는** 무엇을 소싱할지(수요·트렌드·마진) 판단할 도구가 부족합니다.
+
+이 서비스는 **자연어 한 줄**로 상황 기반 추천을 받고, 상품 상세에서 리뷰 분석·유사 상품 비교를 보며, 전역 AI 챗봇이 현재 상품·장바구니 맥락까지 이해해 응대합니다. 관리자(셀러)는 **데이터 기반 소싱 아이디어·검색 트렌드·목표 마진 계산**과 **고객 니즈 대시보드**로 의사결정을 돕습니다.
+
+---
+
+## 3. 주요 기능
+
+### 고객 (스토어)
+- **카테고리 진열** — 6개 카테고리(가전·디지털/패션/홈·리빙/스포츠/뷰티/식품), 카테고리당 약 800개 상품(다중 키워드 병합), 40개씩 페이지네이션
+- **검색** — 키워드 검색 + 정렬(정확도/가격/최신) + 페이지네이션
+- **상품 상세** — 가격·판매처, **AI 리뷰 요약·장단점·대표 사용자 리뷰 5개**, **비슷한 상품 비교**
+- **AI 상황 추천** — "신혼집 거실 가성비 공기청정기" 같은 자연어 → 맥락에 맞는 상품 (엄격 선별)
+- **계절 큐레이션** — 여행/계절/라이프스타일 테마 진열
+- **장바구니 · 모의 주문** — 익명 장바구니(localStorage), 주문번호 발급(실결제 없음)
+- **AI 상담 챗봇(전역)** — 현재 보는 상품·장바구니를 인식, 추천 상품을 **클릭 가능한 카드 + 바로 담기**로 제시
+
+### 관리자 (`/admin`, 로그인 필요)
+- **고객 니즈 대시보드** — 챗봇 대화 로그를 집계·GPT 분석(인텐트 분포·핵심 니즈·기회)
+- **상품 소싱 아이디어** — AI 소싱 아이디어 + **네이버 데이터랩 검색 트렌드**(상승/하락·피크월·스파크라인) + **목표 마진율 실계산**(필요 사입가/판매가) + **입력 전 '지금 뜨는 트렌드' 보드**(클릭 시 AI 추세 해석)
+- **쿠팡/자사몰 링크 관리** — URL 저장(OG 자동 보강) · 수동 가격 · **가격 변동 추적**(이력·▲▼·스파크라인) · 태그/검색 필터
+
+### 공통
+- **품질 검열** — 1000원 이하·가격 미상 상품 전역 제외(부속품·스팸성 저가 리스팅 차단)
+
+---
+
+## 4. 사용 기술 스택
+
+| 구분 | 기술 |
+|---|---|
+| 프레임워크 | **Next.js 16** (App Router, 풀스택) · **React 19** |
+| 스타일 | **Tailwind CSS v4** · Pretendard · JetBrains Mono |
+| 데이터베이스 | **MongoDB Atlas** |
+| 검증·로깅·차트 | zod · winston · recharts |
+| 외부 API | **네이버 쇼핑 검색 API** · **네이버 데이터랩(검색어 트렌드) API** · **OpenAI (gpt-5.5)** |
+| 배포 | **Vercel** |
+
+---
+
+## 5. 실행 방법
 
 ```bash
 npm install
-cp .env.local.example .env.local   # 키 입력
-npm run dev
+cp .env.local.example .env.local   # 아래 키 입력
+npm run dev                        # http://localhost:3000
 ```
 
 ### 환경변수
 
 | 키 | 설명 | 필수 |
-| --- | --- | --- |
-| `MONGODB_URI` | MongoDB Atlas 연결 문자열 | 링크/대시보드/캐시에 필요 |
-| `MONGODB_DB` | DB 이름 (URI에 없을 때) | 선택 |
-| `OPENAI_API_KEY` | OpenAI API 키 | 필수 |
+|---|---|---|
+| `MONGODB_URI` | MongoDB Atlas 연결 문자열 | ✅ |
+| `MONGODB_DB` | DB 이름(기본 `commerce`) | 선택 |
+| `OPENAI_API_KEY` | OpenAI API 키 | ✅ |
 | `OPENAI_MODEL` | 기본 `gpt-5.5` | 선택 |
-| `NAVER_CLIENT_ID` | 네이버 개발자센터 검색 API | 필수 |
-| `NAVER_CLIENT_SECRET` | 네이버 검색 API 시크릿 | 필수 |
-| `ADMIN_API_KEY` | 관리자 로그인 비밀번호 겸 `/api/dashboard` Bearer 키 | 대시보드에 필요 |
-| `ADMIN_PASSWORD` | 관리자 로그인 비밀번호(미설정 시 `ADMIN_API_KEY` 사용) | 선택 |
-| `SESSION_SECRET` | 세션 쿠키 서명 키(미설정 시 `ADMIN_API_KEY` 사용) | 선택 |
+| `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` | 네이버 개발자센터(검색+데이터랩) | ✅ |
+| `ADMIN_PASSWORD` | 관리자 로그인 비밀번호(미설정 시 `ADMIN_API_KEY`) | 선택 |
+| `ADMIN_API_KEY` | 대시보드 Bearer 키 겸 비번 폴백 | 선택 |
+| `SESSION_SECRET` | 세션 쿠키 서명 키(미설정 시 `ADMIN_API_KEY`) | 선택 |
 
-> MongoDB 미설정 시: `links`/`dashboard`는 503으로 응답하고, `review` 캐시·`chat` 로그는 조용히 skip하며 본 기능은 동작합니다(graceful degradation).
+> MongoDB 미설정 시: 링크/대시보드/주문은 비활성(503), 리뷰 캐시·대화 로그는 조용히 skip하며 핵심 기능은 동작합니다(graceful degradation).
 
-## Vercel 배포
+배포: Vercel에 임포트 → Root Directory = 저장소 루트 → 위 환경변수 등록 → 배포.
 
-1. 이 저장소를 Vercel에 임포트합니다.
-2. **Root Directory**는 저장소 루트(이 폴더)로 둡니다.
-3. 위 환경변수 7종을 등록합니다.
-4. 배포 후, `public/widget.js` 삽입 스니펫의 도메인을 실제 Vercel 도메인으로 안내합니다.
+---
 
-API 라우트는 mongodb 드라이버를 사용하므로 Node.js 런타임에서 실행됩니다(`export const runtime = "nodejs"`).
+## 6. 배포 URL
 
-### 레이트리밋 / 보안
+**https://commerce-agent-ecru.vercel.app** (Vercel 프로덕션, GitHub 연동 자동 배포)
 
-모든 `/api` 라우트에 IP 기반 경량 레이트리밋(`lib/rateLimit.js`)이 적용되어 있습니다(GPT 라우트 10/분, dashboard 20/분, links 30/분). 공유 OpenAI·네이버 키 할당량을 캐주얼 남용으로부터 보호하기 위한 1차 방어선입니다.
+---
 
-> 서버리스에서는 인스턴스별 인메모리라 **best-effort**입니다. 트래픽이 많거나 하드 제한이 필요하면 **Vercel WAF rate rules**를 함께 사용하세요. 키 노출 위험이 크면 이 프로젝트 전용 OpenAI/네이버 키를 별도 발급하는 것을 권장합니다.
+## 7. 테스트 계정 정보
 
-### 관리자 로그인
+- **고객**: 로그인 불필요 (익명 장바구니/모의 주문)
+- **관리자**: `/login` 에서 비밀번호 **`admin`** 입력 → `/admin`(대시보드·소싱·링크관리 접근)
+  - 미로그인 시 `/admin`·`/dashboard`·`/sourcing`·`/links`는 `/login`으로 리다이렉트(Next.js Proxy 보호)
 
-`/dashboard` 등 관리자 기능은 로그인 후에만 접근할 수 있습니다.
+---
 
-- `/login`에서 비밀번호 입력 → 검증 시 서명된 httpOnly 세션 쿠키(24h) 발급
-- `proxy.js`(Next.js Proxy)가 `/dashboard` 접근을 가로채 미인증 시 `/login`으로 리다이렉트
-- 비밀번호는 `ADMIN_PASSWORD`(없으면 `ADMIN_API_KEY`), 쿠키 서명은 `SESSION_SECRET`(없으면 `ADMIN_API_KEY`)
-- `/api/dashboard`는 세션 쿠키 **또는** `Authorization: Bearer <ADMIN_API_KEY>`(프로그램 접근) 허용
+## 8. LLM / Agent 동작 구조
 
-## 고객 응대 위젯 삽입
+- **공통 파이프라인**: `자연어 입력 → GPT로 의도·키워드 추출(chatJSON) → 네이버 검색 → GPT로 정렬·요약·판단 → 결과(+필요 시 MongoDB 저장)`
+- **LLM 래퍼** (`lib/openai.js`): `chatText` / `chatJSON` — 2회 재시도 · `AbortSignal` 타임아웃 · 코드펜스/슬라이스로 JSON 복구 · 429(quota)/401 시 중단
+- **모델 특성 대응 (gpt-5.5)**: ① 커스텀 `temperature` 미지원 → 지원 모델에만 전송 ② **reasoning 토큰이 출력 토큰을 함께 소비** → 복잡한 프롬프트는 `max_completion_tokens`를 넉넉히(출력 잘림·빈 JSON 방지)
+- **기능별 에이전트**
+  - `recommend` — 2단계: ①의도(productType/keywords/avoid) 추출 ②후보를 **엄격 선별**(유형 불일치·부속품·비현실 저가 제외, fitScore 컷)
+  - `review` — 검색 컨텍스트 + 평판으로 요약·장단점·점수·**대표 리뷰 5개** 생성(캐시)
+  - `chat` — 시스템 프롬프트에 **상품 검색 결과 + 현재 상품 + 장바구니 + 대화 이력** 주입, 추천 상품(pkey)을 카드로 반환
+  - `dashboard` — `conversations` 집계 + GPT가 실제 메시지로 니즈/경향/기회 분석
+  - `sourcing` / `trend-analysis` — 아이디어 생성 + 데이터랩 트렌드 + 마진 계산 + 추세 AI 해석
+  - `curation` — 시즌 테마 도출 → 테마별 상품(24h 캐시)
 
-임의의 쇼핑몰 HTML에 아래 한 줄을 추가하면 우하단에 AI 상담 챗봇이 떠 응대합니다.
+---
 
-```html
-<script src="https://commerce-agent-ecru.vercel.app/widget.js" data-shop="내 쇼핑몰 이름"></script>
+## 9. 데이터 흐름
+
+```
+[네이버 쇼핑 검색] → searchShop() → products 캐시(키: productId||link = pkey)
+                                  ↘ 리스팅 TTL 캐시(쿼터 보호)
+상품 상세/장바구니 → pkey로 products 캐시 조회 (미스 시 ?q 제목으로 재검색 복구)
+장바구니(localStorage) → /api/orders → orders 컬렉션(모의 주문)
+AI 챗봇 → /api/chat → conversations 컬렉션 → /api/dashboard(집계·GPT 분석)
+[네이버 데이터랩] → searchTrend()/trendBoard() → 소싱·트렌드 보드
 ```
 
-> 라이브: **https://commerce-agent-ecru.vercel.app** · `/widget-demo`에서 실제 위젯과 자동 생성된 스니펫을 확인할 수 있습니다.
+- **상품 캐시(척추)**: 네이버 검색 API는 "ID로 단건 조회"가 없어, 검색 결과를 `products`에 upsert해 두고 상세/장바구니/주문이 `pkey`로 읽습니다.
+- **MongoDB 컬렉션**: `products`(상품 캐시), `listings`(진열/트렌드 캐시), `orders`(모의 주문), `conversations`(대화 로그), `reviews`(리뷰 분석 캐시), `links`(링크 관리)
 
-## 기술 스택
+---
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · MongoDB · zod · winston · recharts · 네이버 쇼핑 API · OpenAI
+## 10. 중점적으로 구현한 부분
 
-디자인: 다크 프리미엄 + 오렌지(#ff5c1a) 단일 악센트, Pretendard + JetBrains Mono, 모노스페이스 악센트(ZERO STUDIO 톤).
+- **상품 데이터 척추** — 네이버 API의 단건 조회 부재를 캐시(`productId||link`) + `?q` 재검색 복구로 해결 → 상세/장바구니/주문이 새로고침·직접링크에도 안전
+- **AI 추천 정확도** — 예산 입력 시 가격 오름차순으로 잡동사니가 추천되던 버그를 발견·수정(관련도 검색 + 엄격 선별)
+- **챗봇–스토어 연결** — 현재 상품·장바구니 인식 + 추천 상품 클릭/담기
+- **데이터 기반 소싱** — 데이터랩 실 트렌드 + 목표 마진 실계산(시장가 앵커) + 추세 AI 해석
+- **정직성** — 가짜 데이터를 만들지 않음: 실제 평점은 API에 없고 크롤링도 봇 차단이라 **만들지 않음**, AI가 생성한 리뷰는 "대표 리뷰(추정)"로 명시
+- **쿼터·비용 보호** — 리스팅 TTL 캐시, 1000원 이하 검열, IP 레이트리밋, gpt-5.5 토큰 관리
+
+---
+
+## 11. 구현하지 못한 부분
+
+- **실제 사용자 평점/리뷰** — 네이버 검색 API 미제공 + 카탈로그 페이지 크롤링은 봇 차단(418/캡차) → AI 대표 리뷰로 대체
+- **실결제** — 결제 PG 미연동(모의 주문만)
+- **고객 계정/주문 내역** — 익명(localStorage)만, 회원 인증 없음
+- **쿠팡 자동 가격 수집** — 봇 차단으로 OG 추출 불가 → 수동 입력으로 처리
+- **네이버 쇼핑인사이트(구매·인구통계)** — 별도 권한 가능성으로 미적용(검색어 트렌드만 사용)
+- **상품 중복 리스팅 dedup**, 실시간 가격 동기화
+
+---
+
+## 12. 향후 개선 방향
+
+- **자체 리뷰 시스템** — 스토어 방문자의 실제 별점·리뷰를 수집 → AI가 그것을 요약(진짜 사용자 데이터 기반)
+- **결제 연동** — 토스페이먼츠/포트원 등 PG + 회원·주문 내역
+- **공유 키 보호 강화** — Vercel WAF rate rules, 프로젝트 전용 OpenAI/네이버 키
+- **쇼핑인사이트** — 구매·연령/성별 인구통계 반영
+- **검색 필터·무한 스크롤**, 추천 키워드 추출 고도화, 중복 상품 정리
+
+---
+
+## 13. AI 개발 도구 활용 여부
+
+본 프로젝트는 **Claude Code (Anthropic)** 를 활용해 개발했습니다.
+
+- 클라우드 계획(ultraplan)으로 초기 설계를 잡고, 로컬 CLI에서 구현·검증·배포까지 AI 페어프로그래밍으로 진행
+- 설계 판단(예: 상품 캐시 구조, gpt-5.5 토큰 이슈, 크롤링 가능성 검증)과 코드 작성, 빌드/배포 자동화에 AI를 적극 활용
+- 외부 데이터의 한계(실제 평점 부재, 봇 차단 등)는 임의로 메우지 않고 **검증된 사실에 기반해 정직하게 처리**하는 것을 원칙으로 삼음
