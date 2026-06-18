@@ -2,6 +2,7 @@ import Link from "next/link";
 import AdminLogout from "@/components/AdminLogout";
 
 const ADMIN_TOOLS = [
+  { href: "/admin/orders", en: "ORDERS", title: "주문 내역", desc: "모의 결제로 생성된 주문과 매출 요약을 확인합니다." },
   { href: "/dashboard", en: "DASHBOARD", title: "고객 니즈 대시보드", desc: "상담 위젯 대화 로그를 분석해 니즈·기회를 시각화합니다." },
   { href: "/sourcing", en: "SOURCING", title: "소싱 아이디어", desc: "분야/키워드로 상품 소싱 아이디어와 시장 신호를 제안받습니다." },
   { href: "/links", en: "LINKS", title: "쿠팡/자사몰 링크 관리", desc: "상품 URL을 저장·보강해 태그로 관리합니다." },
