@@ -6,7 +6,6 @@ import AddToCartBar from "@/components/AddToCartBar";
 import ProductGrid from "@/components/ProductGrid";
 import ProductReviews from "@/components/ProductReviews";
 import CurrentProductSignal from "@/components/CurrentProductSignal";
-import { formatPrice as fmt } from "@/lib/format";
 
 export async function generateMetadata({ params, searchParams }) {
   const { id } = await params;
@@ -15,7 +14,7 @@ export async function generateMetadata({ params, searchParams }) {
   if (!product) return { title: "상품을 찾을 수 없습니다" };
 
   const title = product.title || "상품";
-  const priceText = product.lprice ? ` · ${fmt(product.lprice)}` : "";
+  const priceText = product.lprice ? ` · ${formatPrice(product.lprice)}` : "";
   const desc = `${title}${priceText}${product.mallName ? ` · ${product.mallName}` : ""} — AI 추천·리뷰 분석과 함께 둘러보세요.`;
   const canonical = `/product/${encodeURIComponent(product.pkey)}`;
   return {

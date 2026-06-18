@@ -85,7 +85,7 @@ export default function AdminOrdersPage() {
       )}
 
       {orders.length > 0 && (
-        <Card className="overflow-hidden p-0">
+        <div className="overflow-hidden rounded-2xl border border-black/[0.07] bg-[#ffffff]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -144,7 +144,7 @@ export default function AdminOrdersPage() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );
