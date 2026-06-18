@@ -16,6 +16,10 @@ export default function SourcingPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [board, setBoard] = useState(null);
+  const [analyzeKw, setAnalyzeKw] = useState("");
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisErr, setAnalysisErr] = useState("");
 
   useEffect(() => {
     fetch("/api/trends")
@@ -23,6 +27,28 @@ export default function SourcingPage() {
       .then((d) => setBoard(d.board || []))
       .catch(() => setBoard([]));
   }, []);
+
+  async function analyzeTrend(t) {
+    setKeyword(t.keyword);
+    setAnalyzeKw(t.keyword);
+    setAnalysis(null);
+    setAnalysisErr("");
+    setAnalyzing(true);
+    try {
+      const d = await postJSON("/api/trend-analysis", {
+        keyword: t.keyword,
+        momentum: t.momentum,
+        direction: t.direction,
+        peakMonth: t.peakMonth,
+        series: t.series,
+      });
+      setAnalysis(d.analysis);
+    } catch (err) {
+      setAnalysisErr(err.message);
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -59,8 +85,10 @@ export default function SourcingPage() {
               <button
                 key={t.keyword}
                 type="button"
-                onClick={() => setKeyword(t.keyword)}
-                className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2 text-left transition hover:border-[#ff5c1a]/50"
+                onClick={() => analyzeTrend(t)}
+                className={`flex items-center gap-2 rounded-xl border bg-white/[0.02] px-3 py-2 text-left transition hover:border-[#ff5c1a]/50 ${
+                  analyzeKw === t.keyword ? "border-[#ff5c1a]/60" : "border-white/[0.07]"
+                }`}
               >
                 <span className="min-w-0 flex-1 truncate text-sm text-[#eaeaea]">{t.keyword}</span>
                 <span className="ca-mono whitespace-nowrap text-xs font-semibold" style={{ color: dirStyle(t.direction).color }}>
@@ -71,6 +99,66 @@ export default function SourcingPage() {
               </button>
             ))}
           </div>
+        </Card>
+      )}
+
+      {(analyzing || analysis || analysisErr) && (
+        <Card className="mb-6">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="ca-mono rounded-md border border-[#ff5c1a]/40 px-2 py-0.5 text-[11px] text-[#ff7a3d]">AI 트렌드 해석</span>
+            <span className="font-semibold text-[#fafafa]">{analyzeKw}</span>
+            {analysis?.verdict && (
+              <span
+                className="ca-mono rounded-md px-2 py-0.5 text-xs font-semibold"
+                style={
+                  analysis.verdict === "좋음"
+                    ? { color: "#5fbf8a", border: "1px solid rgba(95,191,138,0.4)" }
+                    : analysis.verdict === "나쁨"
+                    ? { color: "#ff6b6b", border: "1px solid rgba(255,107,107,0.4)" }
+                    : { color: "#9a9a9d", border: "1px solid rgba(255,255,255,0.15)" }
+                }
+              >
+                {analysis.verdict}
+              </span>
+            )}
+          </div>
+
+          {analyzing && <p className="text-sm text-[#86868a]">AI가 추세를 분석하는 중…</p>}
+          {analysisErr && <p className="text-sm text-red-300">{analysisErr}</p>}
+
+          {analysis && (
+            <div className="space-y-2.5 text-sm">
+              {analysis.summary && <p className="text-[#c8c8cc]">{analysis.summary}</p>}
+              {analysis.reasons?.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-[#909093]">추세 원인 (추정)</p>
+                  <ul className="mt-1 list-disc pl-5 text-[#b8b8bc]">
+                    {analysis.reasons.map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {analysis.seasonality && (
+                <p className="text-[#b8b8bc]">
+                  <b className="text-[#909093]">계절성</b> · {analysis.seasonality}
+                </p>
+              )}
+              {analysis.sourcingTip && (
+                <p className="rounded-xl bg-[#ff5c1a]/10 px-3 py-2 text-[#ff9d6e]">
+                  <b>소싱 팁</b> · {analysis.sourcingTip}
+                </p>
+              )}
+              {analysis.outlook && (
+                <p className="text-[#b8b8bc]">
+                  <b className="text-[#909093]">전망</b> · {analysis.outlook}
+                </p>
+              )}
+              <p className="ca-mono text-[10px] leading-relaxed text-[#5e5e62]">
+                ※ 검색 트렌드 데이터 + AI 일반지식 기반 해석(추정). 실시간 시장·뉴스 요인은 반영되지 않을 수 있습니다.
+              </p>
+            </div>
+          )}
         </Card>
       )}
 
