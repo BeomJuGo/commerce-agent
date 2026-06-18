@@ -5,6 +5,17 @@ import { getSeasonalCuration } from "@/lib/curate";
 import ProductGrid from "@/components/ProductGrid";
 import AIRecommend from "@/components/AIRecommend";
 
+const HOME_TITLE = "AI 쇼핑몰 — 상황을 말하면 AI가 골라드립니다";
+const HOME_DESC =
+  "캠핑·홈카페·운동 등 상황만 입력하면 AI가 상품을 추천·비교·분석해 주는 쇼핑몰. 자체 장바구니·주문, 리뷰 요약, 실시간 응대까지.";
+export const metadata = {
+  title: HOME_TITLE,
+  description: HOME_DESC,
+  alternates: { canonical: "/" },
+  openGraph: { title: HOME_TITLE, description: HOME_DESC, url: "/" },
+  twitter: { title: HOME_TITLE, description: HOME_DESC },
+};
+
 export default async function StoreHome() {
   // 카테고리별 rail — 여러 키워드 병합 + TTL 캐시(쿼터 보호)
   const rails = await Promise.all(

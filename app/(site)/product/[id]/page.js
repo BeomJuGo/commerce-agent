@@ -1,10 +1,37 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getProduct, getListing } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
 import AddToCartBar from "@/components/AddToCartBar";
 import ProductGrid from "@/components/ProductGrid";
 import ProductReviews from "@/components/ProductReviews";
 import CurrentProductSignal from "@/components/CurrentProductSignal";
+import { formatPrice as fmt } from "@/lib/format";
+
+export async function generateMetadata({ params, searchParams }) {
+  const { id } = await params;
+  const sp = await searchParams;
+  const product = await getProduct(decodeURIComponent(id), { q: sp.q ? String(sp.q) : undefined });
+  if (!product) return { title: "상품을 찾을 수 없습니다" };
+
+  const title = product.title || "상품";
+  const priceText = product.lprice ? ` · ${fmt(product.lprice)}` : "";
+  const desc = `${title}${priceText}${product.mallName ? ` · ${product.mallName}` : ""} — AI 추천·리뷰 분석과 함께 둘러보세요.`;
+  const canonical = `/product/${encodeURIComponent(product.pkey)}`;
+  return {
+    title,
+    description: desc,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      title,
+      description: desc,
+      url: canonical,
+      images: product.image ? [{ url: product.image }] : undefined,
+    },
+    twitter: { card: "summary_large_image", title, description: desc },
+  };
+}
 
 export default async function ProductPage({ params, searchParams }) {
   const { id } = await params;
@@ -34,10 +61,16 @@ export default async function ProductPage({ params, searchParams }) {
         ← 쇼핑 계속하기
       </Link>
       <div className="mt-4 grid gap-8 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl border border-black/[0.07] bg-[#f1f1f3]">
+        <div className="relative aspect-square overflow-hidden rounded-2xl border border-black/[0.07] bg-[#f1f1f3]">
           {product.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.image} alt={product.title || ""} className="w-full object-cover" />
+            <Image
+              src={product.image}
+              alt={product.title || ""}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 480px"
+              className="object-cover"
+            />
           ) : (
             <div className="ca-mono flex aspect-square items-center justify-center text-xs text-[#a1a1aa]">NO IMAGE</div>
           )}
