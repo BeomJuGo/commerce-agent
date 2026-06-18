@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { parseBody, handleError } from "@/lib/validate";
 import { recommendSchema } from "@/lib/schemas";
 import { searchShop } from "@/lib/naver";
-import { chatJSON } from "@/lib/openai";
+import { chatJSON, FAST_MODEL } from "@/lib/openai";
 import { rateLimit } from "@/lib/rateLimit";
 import { productKey, cacheProducts } from "@/lib/products";
 import logger from "@/lib/logger";
@@ -55,7 +55,7 @@ export async function POST(req) {
             `형식: {"ranked":[{"id":후보id,"reason":"추천 이유 30자 이내","fitScore":0~100}],"summary":"추천 요약 1~2문장"}`,
         },
       ],
-      { maxTokens: 3000 }
+      { model: FAST_MODEL, temperature: 0.2, maxTokens: 1500 } // 빠른 모델로 랭킹(지연 단축)
     );
 
     const products = (ranked.ranked || [])
